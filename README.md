@@ -52,7 +52,6 @@ uvicorn app.main:app --reload
 POST /query
 {
   "question": "What were our top 5 products last month?",
-  "db_config": { ... }  # Optional or preconfigured
 }
 ```
 
