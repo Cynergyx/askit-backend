@@ -28,9 +28,11 @@ class Config:
     
 class DevelopmentConfig(Config):
     DEBUG = True
+    FLASK_ENV = 'development'
     
 class ProductionConfig(Config):
     DEBUG = False
+    FLASK_ENV = 'production'
     
 class TestingConfig(Config):
     TESTING = True
