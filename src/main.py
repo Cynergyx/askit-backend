@@ -22,12 +22,14 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     from src.routes.role_routes import role_bp
     from src.routes.audit_routes import audit_bp
     from src.routes.database_access_routes import db_access_bp
+    from src.routes.data_source_routes import datasource_bp # <-- Import new blueprint
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(role_bp, url_prefix='/api/roles')
     app.register_blueprint(audit_bp, url_prefix='/api/audit')
     app.register_blueprint(db_access_bp, url_prefix='/api/users')
+    app.register_blueprint(datasource_bp, url_prefix='/api/datasources')
 
 
     # Register JWT error handlers

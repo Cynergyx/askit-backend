@@ -15,6 +15,9 @@ class Config:
     # Redis Configuration
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
     
+    # Encryption key for data at rest
+    ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY')
+    
     # SSO Configuration
     OAUTH2_CLIENT_ID = os.environ.get('OAUTH2_CLIENT_ID')
     OAUTH2_CLIENT_SECRET = os.environ.get('OAUTH2_CLIENT_SECRET')
@@ -37,3 +40,4 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    ENCRYPTION_KEY = 'fYi33R_t2iP80PTZ2R_1n9d5VpGj2N_1aPFrGgO0NhQ='
