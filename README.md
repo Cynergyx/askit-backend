@@ -72,7 +72,7 @@ This is the backend core for an advanced Identity and Access Management (IAM) pl
 
 #### 📁 Repo Structure
 ```
-authguard-backend/
+askit-backend/
 ├── src/
 │ ├── main.py # Flask App Factory
 │ ├── extensions.py # Centralized Flask extensions
