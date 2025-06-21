@@ -10,8 +10,7 @@ class AuthController:
     @staticmethod
     @audit_action('LOGIN')
     def login():
-        # ... (no changes to method logic)
-        # Omitted for brevity, logic remains the same
+        """Standard email/password login"""
         data = request.get_json()
         
         if not data or not all(k in data for k in ('email', 'password', 'organization')):
@@ -31,8 +30,7 @@ class AuthController:
     @staticmethod
     @audit_action('REGISTER')
     def register():
-        # ... (no changes to method logic)
-        # Omitted for brevity, logic remains the same
+        """User registration"""
         data = request.get_json()
         
         required_fields = ['email', 'password', 'first_name', 'last_name', 'organization']
@@ -55,8 +53,7 @@ class AuthController:
     @staticmethod
     @jwt_required()
     def refresh():
-        # ... (no changes to method logic)
-        # Omitted for brevity, logic remains the same
+        """Refresh access token"""
         result, error = AuthService.refresh_token()
         
         if error:
@@ -66,8 +63,7 @@ class AuthController:
 
     @staticmethod
     def sso_login():
-        # ... (no changes to method logic)
-        # Omitted for brevity, logic remains the same
+        """SSO login (OAuth2, SAML, LDAP)"""
         data = request.get_json()
         
         if not data or 'provider' not in data or 'organization' not in data:
@@ -116,6 +112,7 @@ class AuthController:
     @staticmethod
     @jwt_required_with_org
     def logout():
+        """User logout"""
         AuditService.log_action(
             user_id=g.current_user.id,
             organization_id=g.current_organization.id,
@@ -123,4 +120,5 @@ class AuthController:
             ip_address=request.remote_addr,
             user_agent=request.headers.get('User-Agent')
         )
+        
         return jsonify({'message': 'Logged out successfully'}), 200

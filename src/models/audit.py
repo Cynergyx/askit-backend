@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class AuditLog(db.Model):
@@ -14,7 +14,7 @@ class AuditLog(db.Model):
     details = db.Column(db.JSON)
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.now(timezone.utc), index=True)
     session_id = db.Column(db.String(100))
     
     # Relationships
@@ -46,7 +46,7 @@ class PermissionChangeLog(db.Model):
     permission_before = db.Column(db.JSON)
     permission_after = db.Column(db.JSON)
     reason = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     user = db.relationship('User', foreign_keys=[user_id])

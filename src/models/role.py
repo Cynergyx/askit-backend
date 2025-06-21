@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class Role(db.Model):
@@ -14,8 +14,8 @@ class Role(db.Model):
     level = db.Column(db.Integer, default=0)
     is_system_role = db.Column(db.Boolean, default=False)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     
     # Relationships
     organization = db.relationship('Organization', backref='roles')
@@ -62,7 +62,7 @@ class RolePermission(db.Model):
     role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False)
     permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), nullable=False)
     granted_by = db.Column(db.String(36), db.ForeignKey('users.id'))
-    granted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    granted_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     is_active = db.Column(db.Boolean, default=True)
     
     # Relationships

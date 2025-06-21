@@ -1,7 +1,7 @@
 from src.extensions import db
 from src.utils.security import DataEncryption
 from flask import current_app
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class UserDatabaseAccess(db.Model):
@@ -12,7 +12,7 @@ class UserDatabaseAccess(db.Model):
     data_source_id = db.Column(db.String(36), db.ForeignKey('data_sources.id'), nullable=False, index=True)
     
     granted_by = db.Column(db.String(36), db.ForeignKey('users.id'))
-    granted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    granted_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     user = db.relationship('User', back_populates='database_accesses', foreign_keys=[user_id])

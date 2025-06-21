@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class Permission(db.Model):
@@ -13,7 +13,7 @@ class Permission(db.Model):
     action = db.Column(db.String(50), nullable=False)
     conditions = db.Column(db.JSON)  # For row-level security conditions
     is_system_permission = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     role_permissions = db.relationship('RolePermission', back_populates='permission')
@@ -44,7 +44,7 @@ class DataAccessPolicy(db.Model):
     access_type = db.Column(db.Enum('READ', 'WRITE', 'DELETE', name='access_type'), nullable=False)
     conditions = db.Column(db.JSON)  # Row-level security conditions
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     organization = db.relationship('Organization', backref='data_access_policies')
@@ -61,7 +61,7 @@ class DataMaskingPolicy(db.Model):
     masking_pattern = db.Column(db.String(255))  # e.g., "XXX-XX-XXXX" for SSN
     conditions = db.Column(db.JSON)  # When to apply masking
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     organization = db.relationship('Organization', backref='data_masking_policies')

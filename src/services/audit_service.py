@@ -23,8 +23,6 @@ class AuditService:
         db.session.commit()
         return audit_log
     
-    # ... other methods remain the same ...
-    # Omitted for brevity
     @staticmethod
     def log_permission_change(user_id, organization_id, target_user_id=None, target_role_id=None, 
                             action='MODIFY', permission_before=None, permission_after=None, reason=None):

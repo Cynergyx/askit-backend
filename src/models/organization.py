@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class Organization(db.Model):
@@ -12,8 +12,8 @@ class Organization(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     settings = db.Column(db.JSON)  # Organization-specific settings
     sso_config = db.Column(db.JSON)  # SSO configuration
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     
     def to_dict(self):
         return {
@@ -34,7 +34,7 @@ class OrganizationSSOConfig(db.Model):
     provider = db.Column(db.String(50), nullable=False)  # oauth2, saml, ldap, okta
     config = db.Column(db.JSON, nullable=False)  # Provider-specific configuration
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     organization = db.relationship('Organization', backref='sso_configs')

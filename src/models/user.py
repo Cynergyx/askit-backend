@@ -1,6 +1,6 @@
 from src.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class User(db.Model):
@@ -17,8 +17,8 @@ class User(db.Model):
     sso_provider = db.Column(db.String(50))
     sso_user_id = db.Column(db.String(255))
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.utcnow)
     last_login = db.Column(db.DateTime)
     
     # Relationships

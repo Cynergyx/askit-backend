@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class DataSource(db.Model):
@@ -22,8 +22,8 @@ class DataSource(db.Model):
     # Extra connection params (e.g., for Snowflake warehouse, role, etc.)
     extra_params = db.Column(db.JSON) 
     
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     organization = db.relationship('Organization', backref='data_sources')
 
