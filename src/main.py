@@ -22,7 +22,7 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     from src.routes.role_routes import role_bp
     from src.routes.audit_routes import audit_bp
     from src.routes.database_access_routes import db_access_bp
-    from src.routes.data_source_routes import datasource_bp # <-- Import new blueprint
+    from src.routes.data_source_routes import datasource_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(user_bp, url_prefix='/api/users')
