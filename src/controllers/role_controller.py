@@ -4,7 +4,7 @@ from src.models.permission import Permission
 from src.services.audit_service import AuditService
 from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
-from src.app import db
+from src.extensions import db
 from datetime import datetime
 import uuid
 

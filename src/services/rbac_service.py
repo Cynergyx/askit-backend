@@ -2,7 +2,7 @@ from src.models.user import User, UserRole
 from src.models.role import Role, RolePermission
 from src.models.permission import Permission, DataAccessPolicy, DataMaskingPolicy
 from src.services.audit_service import AuditService
-from src.app import db
+from src.extensions import db
 from sqlalchemy import and_, or_
 import json
 

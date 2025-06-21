@@ -1,4 +1,4 @@
-from src.app import db
+from src.extensions import db
 from datetime import datetime
 import uuid
 

@@ -4,7 +4,7 @@ from src.models.user import User
 from src.models.organization import Organization, OrganizationSSOConfig
 from src.services.auth_service import AuthService
 from src.services.audit_service import AuditService
-from src.app import db
+from src.extensions import db
 import requests
 import ldap
 import uuid

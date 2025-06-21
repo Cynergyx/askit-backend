@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash
 from src.models.user import User
 from src.models.organization import Organization
 from src.services.audit_service import AuditService
-from src.app import db
+from src.extensions import db
 from datetime import datetime
 import uuid
 

@@ -4,7 +4,7 @@ from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from src.services.audit_service import AuditService
 from src.services.rbac_service import RBACService
 from src.utils.security import RateLimiting
-from src.app import redis_client
+from src.extensions import redis_client
 import time
 import logging
 

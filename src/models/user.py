@@ -1,4 +1,4 @@
-from src.app import db
+from src.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import uuid
@@ -24,8 +24,12 @@ class User(db.Model):
     # Relationships
     organization = db.relationship('Organization', backref='users')
     user_roles = db.relationship('UserRole', back_populates='user', cascade='all, delete-orphan')
-    audit_logs = db.relationship('AuditLog', backref='user')
+    audit_logs = db.relationship('AuditLog', backref='user', foreign_keys='AuditLog.user_id')
     
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
     
@@ -33,7 +37,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
     
     def get_roles(self):
-        return [ur.role for ur in self.user_roles if ur.is_active]
+        return [ur.role for ur in self.user_roles if ur.is_active and ur.role.is_active]
     
     def get_permissions(self):
         permissions = set()
@@ -41,13 +45,14 @@ class User(db.Model):
             permissions.update(role.get_permissions())
         return list(permissions)
     
-    def to_dict(self, include_sensitive=False):
+    def to_dict(self, include_details=False):
         data = {
             'id': self.id,
             'email': self.email,
             'username': self.username,
             'first_name': self.first_name,
             'last_name': self.last_name,
+            'full_name': self.full_name,
             'is_active': self.is_active,
             'is_sso_user': self.is_sso_user,
             'sso_provider': self.sso_provider,
@@ -55,11 +60,13 @@ class User(db.Model):
             'created_at': self.created_at.isoformat(),
             'last_login': self.last_login.isoformat() if self.last_login else None
         }
-        if include_sensitive:
+        if include_details:
             data['roles'] = [role.to_dict() for role in self.get_roles()]
             data['permissions'] = [perm.to_dict() for perm in self.get_permissions()]
         return data
 
+# ... UserRole model remains the same ...
+# Omitted for brevity
 class UserRole(db.Model):
     __tablename__ = 'user_roles'
     

@@ -4,11 +4,14 @@ from src.services.sso_service import SSOService
 from src.services.audit_service import AuditService
 from src.middleware.auth_middleware import jwt_required_with_org
 from flask_jwt_extended import jwt_required
+from src.utils.decorators import audit_action
 
 class AuthController:
     @staticmethod
+    @audit_action('LOGIN')
     def login():
-        """Standard email/password login"""
+        # ... (no changes to method logic)
+        # Omitted for brevity, logic remains the same
         data = request.get_json()
         
         if not data or not all(k in data for k in ('email', 'password', 'organization')):
@@ -24,10 +27,12 @@ class AuthController:
             return jsonify({'message': error}), 401
         
         return jsonify(result), 200
-    
+
     @staticmethod
+    @audit_action('REGISTER')
     def register():
-        """User registration"""
+        # ... (no changes to method logic)
+        # Omitted for brevity, logic remains the same
         data = request.get_json()
         
         required_fields = ['email', 'password', 'first_name', 'last_name', 'organization']
@@ -46,21 +51,23 @@ class AuthController:
             return jsonify({'message': error}), 400
         
         return jsonify({'user': result}), 201
-    
+
     @staticmethod
     @jwt_required()
     def refresh():
-        """Refresh access token"""
+        # ... (no changes to method logic)
+        # Omitted for brevity, logic remains the same
         result, error = AuthService.refresh_token()
         
         if error:
             return jsonify({'message': error}), 401
         
         return jsonify(result), 200
-    
+
     @staticmethod
     def sso_login():
-        """SSO login (OAuth2, SAML, LDAP)"""
+        # ... (no changes to method logic)
+        # Omitted for brevity, logic remains the same
         data = request.get_json()
         
         if not data or 'provider' not in data or 'organization' not in data:
@@ -105,15 +112,15 @@ class AuthController:
             return jsonify({'message': error}), 401
         
         return jsonify(result), 200
-    
+
     @staticmethod
     @jwt_required_with_org
     def logout():
-        """User logout"""
         AuditService.log_action(
             user_id=g.current_user.id,
             organization_id=g.current_organization.id,
-            action='LOGOUT'
+            action='LOGOUT',
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
         )
-        
         return jsonify({'message': 'Logged out successfully'}), 200

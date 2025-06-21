@@ -1,12 +1,11 @@
 from src.models.audit import AuditLog, PermissionChangeLog
-from src.app import db
-from flask import request
+from src.extensions import db
 from datetime import datetime
 import uuid
 
 class AuditService:
     @staticmethod
-    def log_action(user_id, organization_id, action, resource_type=None, resource_id=None, details=None):
+    def log_action(user_id, organization_id, action, ip_address=None, user_agent=None, session_id=None, resource_type=None, resource_id=None, details=None):
         """Log user action for audit trail"""
         audit_log = AuditLog(
             id=str(uuid.uuid4()),
@@ -16,16 +15,16 @@ class AuditService:
             resource_type=resource_type,
             resource_id=resource_id,
             details=details or {},
-            ip_address=AuditService._get_client_ip(),
-            user_agent=request.headers.get('User-Agent', '') if request else '',
-            session_id=request.headers.get('X-Session-ID', '') if request else ''
+            ip_address=ip_address,
+            user_agent=user_agent,
+            session_id=session_id
         )
-        
         db.session.add(audit_log)
         db.session.commit()
-        
         return audit_log
     
+    # ... other methods remain the same ...
+    # Omitted for brevity
     @staticmethod
     def log_permission_change(user_id, organization_id, target_user_id=None, target_role_id=None, 
                             action='MODIFY', permission_before=None, permission_after=None, reason=None):
@@ -75,17 +74,3 @@ class AuditService:
             query = query.filter_by(target_user_id=target_user_id)
         
         return query.order_by(PermissionChangeLog.timestamp.desc()).limit(limit).all()
-    
-    @staticmethod
-    def _get_client_ip():
-        """Get client IP address from request"""
-        if not request:
-            return None
-        
-        # Check for forwarded IP (behind proxy)
-        if request.headers.get('X-Forwarded-For'):
-            return request.headers.get('X-Forwarded-For').split(',')[0].strip()
-        elif request.headers.get('X-Real-IP'):
-            return request.headers.get('X-Real-IP')
-        else:
-            return request.remote_addr

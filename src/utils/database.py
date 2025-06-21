@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
-from src.app import db
+from src.extensions import db
 from flask import current_app
 import logging
 from contextlib import contextmanager
