@@ -12,4 +12,4 @@ config_name = f"config.{env.capitalize()}Config"
 app = create_app(config_name)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv('PORT', 8080)))
+    app.run(host="0.0.0.0", port=int(os.getenv('PORT', 5000)))

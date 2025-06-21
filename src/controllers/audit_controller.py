@@ -2,7 +2,7 @@ from flask import request, jsonify, g
 from src.services.audit_service import AuditService
 from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 class AuditController:
     @staticmethod
@@ -73,7 +73,7 @@ class AuditController:
     def get_audit_summary():
         """Get audit summary/statistics"""
         # Get summary for last 30 days
-        end_date = datetime.utcnow()
+        end_date = datetime.now(timezone.utc)
         start_date = end_date - timedelta(days=30)
         
         logs = AuditService.get_audit_logs(
