@@ -1,6 +1,6 @@
-### 🛡️ AuthGuard – Advanced RBAC & Identity Backend
+### 🛡️ AskIT – Advanced RBAC & Identity Backend
 
-**AuthGuard** is a robust, multi-tenant backend API service for managing users, roles, and permissions. Built with **Python** and the **Flask** framework, it provides a comprehensive Role-Based Access Control (RBAC) system, complete with authentication, SSO integration, and detailed audit logging. It's designed to be the secure identity core for your applications.
+**AskIT** is a robust, multi-tenant backend API service for managing users, roles, and permissions. Built with **Python** and the **Flask** framework, it provides a comprehensive Role-Based Access Control (RBAC) system, complete with authentication, SSO integration, and detailed audit logging. It's designed to be the secure identity core for your applications.
 
 ---
 
@@ -32,8 +32,8 @@ This is the backend core for an advanced Identity and Access Management (IAM) pl
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-org/authguard-backend.git
-    cd authguard-backend
+    git clone https://github.com/your-org/AskIT-backend.git
+    cd AskIT-backend
     ```
 
 2.  **Create and activate a virtual environment:**
