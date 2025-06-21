@@ -6,6 +6,7 @@ from src.services.audit_service import AuditService
 from src.extensions import db
 from datetime import datetime
 import uuid
+from flask import request
 
 class AuthService:
     @staticmethod
@@ -44,13 +45,15 @@ class AuthService:
             user_id=user.id,
             organization_id=user.organization_id,
             action='LOGIN',
-            details={'method': 'password'}
+            details={'method': 'password'},
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
         )
         
         return {
             'access_token': access_token,
             'refresh_token': refresh_token,
-            'user': user.to_dict(include_sensitive=True)
+            'user': user.to_dict(include_details=True, include_db_access=True)
         }, None
     
     @staticmethod
@@ -77,7 +80,13 @@ class AuthService:
         """Register new user"""
         organization = Organization.query.filter_by(domain=organization_domain).first()
         if not organization:
-            return None, "Organization not found"
+            # For simplicity, we can create the organization if it doesn't exist
+            organization = Organization(
+                id=str(uuid.uuid4()),
+                name=organization_domain.replace('-', ' ').title(),
+                domain=organization_domain
+            )
+            db.session.add(organization)
         
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -86,7 +95,7 @@ class AuthService:
         user = User(
             id=str(uuid.uuid4()),
             email=email,
-            username=email.split('@')[0],
+            username=email.split('@')[0] + str(uuid.uuid4())[:4], # Ensure username is unique
             first_name=first_name,
             last_name=last_name,
             organization_id=organization.id
@@ -101,7 +110,9 @@ class AuthService:
             user_id=user.id,
             organization_id=user.organization_id,
             action='REGISTER',
-            details={'method': 'email'}
+            details={'method': 'email'},
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
         )
         
         return user.to_dict(), None

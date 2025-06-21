@@ -13,7 +13,7 @@ class Config:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     
     # Redis Configuration
-    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379'
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0'
     
     # SSO Configuration
     OAUTH2_CLIENT_ID = os.environ.get('OAUTH2_CLIENT_ID')

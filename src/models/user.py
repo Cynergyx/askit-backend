@@ -25,6 +25,7 @@ class User(db.Model):
     organization = db.relationship('Organization', backref='users')
     user_roles = db.relationship('UserRole', back_populates='user', cascade='all, delete-orphan')
     audit_logs = db.relationship('AuditLog', backref='user', foreign_keys='AuditLog.user_id')
+    database_accesses = db.relationship('UserDatabaseAccess', back_populates='user', cascade='all, delete-orphan', lazy='dynamic')
     
     @property
     def full_name(self):
@@ -45,7 +46,7 @@ class User(db.Model):
             permissions.update(role.get_permissions())
         return list(permissions)
     
-    def to_dict(self, include_details=False):
+    def to_dict(self, include_details=False, include_db_access=False):
         data = {
             'id': self.id,
             'email': self.email,
@@ -63,10 +64,12 @@ class User(db.Model):
         if include_details:
             data['roles'] = [role.to_dict() for role in self.get_roles()]
             data['permissions'] = [perm.to_dict() for perm in self.get_permissions()]
+        
+        if include_db_access:
+            data['database_accesses'] = [access.to_dict() for access in self.database_accesses.all()]
+
         return data
 
-# ... UserRole model remains the same ...
-# Omitted for brevity
 class UserRole(db.Model):
     __tablename__ = 'user_roles'
     
