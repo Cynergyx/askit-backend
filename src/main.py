@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from .extensions import db, jwt, migrate, cors, redis_client
+from src.extensions import db, jwt, migrate, cors, redis_client
 
 def create_app(config_object_name='config.DevelopmentConfig'):
     """Application factory pattern"""

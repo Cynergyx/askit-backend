@@ -1,24 +1,34 @@
 import click
 from flask.cli import with_appcontext
-from .extensions import db
-from .models.organization import Organization
-from .models.user import User
-from .models.role import Role
-from .models.permission import Permission
+from src.extensions import db
+from src.models.organization import Organization
+from src.models.user import User, UserRole
+from src.models.role import Role, RolePermission
+from src.models.permission import Permission
 import os
 import uuid
 
 @click.command(name='seed')
 @with_appcontext
 def seed():
-    """Seeds the database with initial data."""
-    if Role.query.first():
-        click.echo('Database already seeded.')
-        return
+    """Seeds the database with initial data in an idempotent way."""
+    
+    # --- Step 1: Ensure Super Admin Organization Exists ---
+    org_domain = os.getenv('SUPER_ADMIN_ORG_DOMAIN', 'superorg')
+    super_org = Organization.query.filter_by(domain=org_domain).first()
+    if not super_org:
+        super_org = Organization(
+            name=org_domain.title(),
+            domain=org_domain,
+            is_active=True
+        )
+        db.session.add(super_org)
+        db.session.commit()
+        click.echo(f'Created super organization: {super_org.name}')
+    else:
+        click.echo(f'Super organization "{super_org.name}" already exists.')
 
-    click.echo('Seeding database...')
-
-    # --- Create Permissions ---
+    # --- Step 2: Ensure All Permissions Exist ---
     permissions_data = [
         # User Permissions
         {'name': 'user.create', 'resource': 'user', 'action': 'create'},
@@ -49,58 +59,66 @@ def seed():
         # Organization Permissions
         {'name': 'organization.create', 'resource': 'organization', 'action': 'create'},
     ]
-    permissions = [Permission(**p) for p in permissions_data]
-    db.session.bulk_save_objects(permissions)
+    all_permissions = {}
+    for p_data in permissions_data:
+        perm = Permission.query.filter_by(name=p_data['name']).first()
+        if not perm:
+            perm = Permission(**p_data)
+            db.session.add(perm)
+        all_permissions[perm.name] = perm
     db.session.commit()
-    click.echo(f'Created {len(permissions)} permissions.')
+    click.echo('Ensured all system permissions exist.')
 
-    # --- Create Roles ---
-    super_admin_role = Role(name='Super Admin', display_name='Super Administrator', is_system_role=True)
-    org_admin_role = Role(name='Organization Admin', display_name='Organization Administrator', is_system_role=True)
-    member_role = Role(name='Member', display_name='Member', is_system_role=True)
+    # --- Step 3: Ensure System Roles Exist and Have Correct Permissions ---
+    roles_to_ensure = {
+        'Super Admin': {
+            'display_name': 'Super Administrator',
+            'permissions': list(all_permissions.values()) # All permissions
+        },
+        'Organization Admin': {
+            'display_name': 'Organization Administrator',
+            'permissions': [p for p in all_permissions.values() if 'organization.create' not in p.name] # All except org creation
+        },
+        'Member': {
+            'display_name': 'Member',
+            'permissions': [all_permissions['rolerequest.create']]
+        }
+    }
+
+    system_roles = {}
+    for role_name, role_info in roles_to_ensure.items():
+        role = Role.query.filter_by(name=role_name, organization_id=super_org.id).first()
+        if not role:
+            role = Role(
+                name=role_name,
+                display_name=role_info['display_name'],
+                is_system_role=True,
+                organization_id=super_org.id
+            )
+            db.session.add(role)
+        
+        # Ensure permissions are set correctly
+        current_perms = set(role.permissions)
+        required_perms = set(role_info['permissions'])
+        
+        # Add missing permissions
+        for perm in required_perms - current_perms:
+            role.permissions.append(perm)
+        
+        # Remove extra permissions (optional, but good for consistency)
+        for perm in current_perms - required_perms:
+            role.permissions.remove(perm)
+            
+        system_roles[role_name] = role
     
-    db.session.add_all([super_admin_role, org_admin_role, member_role])
     db.session.commit()
-    click.echo('Created base roles.')
+    click.echo('Ensured system roles and their permissions are correct.')
 
-    # --- Assign Permissions to Roles ---
-    # Super Admin gets all permissions
-    for perm in permissions:
-        super_admin_role.permissions.append(perm)
-
-    # Org Admin gets most permissions (except super-admin level ones)
-    admin_perms = [p for p in permissions if 'super' not in p.name]
-    for perm in admin_perms:
-        org_admin_role.permissions.append(perm)
-
-    # Member gets basic read and self-service permissions
-    member_perms_names = ['rolerequest.create']
-    member_perms = Permission.query.filter(Permission.name.in_(member_perms_names)).all()
-    for perm in member_perms:
-        member_role.permissions.append(perm)
-
-    # --- Create Super Admin Organization and User ---
-    org_domain = os.getenv('SUPER_ADMIN_ORG_DOMAIN', 'superorg')
-    super_org = Organization.query.filter_by(domain=org_domain).first()
-    if not super_org:
-        super_org = Organization(
-            name=org_domain.title(),
-            domain=org_domain,
-            is_active=True
-        )
-        db.session.add(super_org)
-        db.session.commit()
-        click.echo(f'Created super organization: {super_org.name}')
-
-    # Set roles to belong to the super organization
-    super_admin_role.organization_id = super_org.id
-    org_admin_role.organization_id = super_org.id
-    member_role.organization_id = super_org.id
-    
+    # --- Step 4: Ensure Super Admin User Exists and Has Role ---
     admin_email = os.getenv('SUPER_ADMIN_EMAIL')
     admin_password = os.getenv('SUPER_ADMIN_PASSWORD')
     if not admin_email or not admin_password:
-        click.echo('SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD must be set in .env')
+        click.echo('ERROR: SUPER_ADMIN_EMAIL and SUPER_ADMIN_PASSWORD must be set in .env')
         return
 
     super_admin_user = User.query.filter_by(email=admin_email).first()
@@ -111,16 +129,35 @@ def seed():
             first_name='Super',
             last_name='Admin',
             organization_id=super_org.id,
-            is_verified=True # Super admin is verified by default
+            is_verified=True
         )
         super_admin_user.set_password(admin_password)
         db.session.add(super_admin_user)
         db.session.commit()
         click.echo(f'Created super admin user: {super_admin_user.email}')
+    else:
+        click.echo(f'Super admin user "{super_admin_user.email}" already exists.')
+
+    # --- Step 5: Assign Super Admin Role Correctly ---
+    super_admin_role = system_roles['Super Admin']
     
-    # Assign Super Admin role to the user
-    super_admin_user.roles.append(super_admin_role)
-    db.session.commit()
-    click.echo('Assigned Super Admin role.')
+    # Check if the user already has the role
+    user_role_link = UserRole.query.filter_by(
+        user_id=super_admin_user.id,
+        role_id=super_admin_role.id
+    ).first()
+
+    if not user_role_link:
+        # Create the UserRole association object to link the user and the role
+        new_assignment = UserRole(
+            user_id=super_admin_user.id,
+            role_id=super_admin_role.id,
+            granted_by=super_admin_user.id # Admin grants role to themselves
+        )
+        db.session.add(new_assignment)
+        db.session.commit()
+        click.echo(f'Assigned "Super Admin" role to {super_admin_user.email}.')
+    else:
+        click.echo(f'User {super_admin_user.email} already has the "Super Admin" role.')
 
     click.echo('Database seeding complete.')

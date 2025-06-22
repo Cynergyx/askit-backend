@@ -27,7 +27,6 @@ class User(db.Model):
     
     # FIX: Explicitly define the foreign key for the user_roles relationship
     user_roles = db.relationship('UserRole', back_populates='user', cascade='all, delete-orphan', foreign_keys='UserRole.user_id')
-    
     audit_logs = db.relationship('AuditLog', backref='user', foreign_keys='AuditLog.user_id')
     database_accesses = db.relationship('UserDatabaseAccess', back_populates='user', cascade='all, delete-orphan', lazy='dynamic', foreign_keys='UserDatabaseAccess.user_id')
     

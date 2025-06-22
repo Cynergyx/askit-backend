@@ -38,3 +38,8 @@ sudo service redis-server stop
     ```bash
     flask db upgrade
     ```
+
+4. **Seed the DB:**
+    ```bash
+    flask seed
+    ```

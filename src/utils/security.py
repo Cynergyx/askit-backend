@@ -3,7 +3,7 @@ import secrets
 import string
 import re
 import bcrypt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -134,8 +134,8 @@ class TokenSecurity:
     @staticmethod
     def create_jwt_token(payload, secret_key, expiry_hours=24):
         """Create JWT token with expiration"""
-        payload['exp'] = datetime.utcnow() + timedelta(hours=expiry_hours)
-        payload['iat'] = datetime.utcnow()
+        payload['exp'] = datetime.now(timezone.utc) + timedelta(hours=expiry_hours)
+        payload['iat'] = datetime.now(timezone.utc)
         return jwt.encode(payload, secret_key, algorithm='HS256')
     
     @staticmethod

@@ -143,3 +143,18 @@ class AuthController:
 
         EmailService.send_verification_email(user.email, user.id)
         return jsonify({'message': 'A new verification email has been sent.'}), 200
+    
+
+    @staticmethod
+    @jwt_required_with_org
+    def logout():
+        """User logout"""
+        AuditService.log_action(
+            user_id=g.current_user.id,
+            organization_id=g.current_organization.id,
+            action='LOGOUT',
+            ip_address=request.remote_addr,
+            user_agent=request.headers.get('User-Agent')
+        )
+        
+        return jsonify({'message': 'Logged out successfully'}), 200
