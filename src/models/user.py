@@ -14,6 +14,7 @@ class User(db.Model):
     last_name = db.Column(db.String(100))
     is_active = db.Column(db.Boolean, default=True)
     is_sso_user = db.Column(db.Boolean, default=False)
+    is_verified = db.Column(db.Boolean, default=False, nullable=False)
     sso_provider = db.Column(db.String(50))
     sso_user_id = db.Column(db.String(255))
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False)
@@ -23,9 +24,12 @@ class User(db.Model):
     
     # Relationships
     organization = db.relationship('Organization', backref='users')
-    user_roles = db.relationship('UserRole', back_populates='user', cascade='all, delete-orphan')
+    
+    # FIX: Explicitly define the foreign key for the user_roles relationship
+    user_roles = db.relationship('UserRole', back_populates='user', cascade='all, delete-orphan', foreign_keys='UserRole.user_id')
+    
     audit_logs = db.relationship('AuditLog', backref='user', foreign_keys='AuditLog.user_id')
-    database_accesses = db.relationship('UserDatabaseAccess', back_populates='user', cascade='all, delete-orphan', lazy='dynamic')
+    database_accesses = db.relationship('UserDatabaseAccess', back_populates='user', cascade='all, delete-orphan', lazy='dynamic', foreign_keys='UserDatabaseAccess.user_id')
     
     @property
     def full_name(self):

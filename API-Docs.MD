@@ -2,6 +2,90 @@
 
 Here is the documentation for the API endpoints.
 
+### Organization (`/api/organizations`)
+
+#### **Organization Onboarding**
+- **Endpoint**: `POST /api/organizations/onboard`
+- **Description**: Onboards a organization
+- **Authorization**: Bearer <super_admin_access_token>
+- **Request Body**:
+    ```json
+    {
+      "organization": {
+        "name": "Acme Corporation",
+        "domain": "acme-corp"
+      },
+      "roles": [
+        {
+          "name": "Data Analyst",
+          "display_name": "Data Analyst"
+        },
+        {
+          "name": "Support Engineer",
+          "display_name": "Support Engineer"
+        }
+      ],
+      "users": [
+        {
+          "first_name": "Alice",
+          "last_name": "Admin",
+          "email": "alice@acme.com",
+          "password": "SecurePassword123!",
+          "is_admin": true
+        },
+        {
+          "first_name": "Bob",
+          "last_name": "Analyst",
+          "email": "bob@acme.com",
+          "password": "AnotherSecurePassword456!",
+          "is_admin": false,
+          "roles": [
+            "Data Analyst"
+          ]
+        }
+      ]
+    }
+    ```
+- **Success Response (201 Created)**:
+    ```json
+    {
+      "organization": {
+        "id": "org-uuid",
+        "name": "Acme Corporation",
+        "domain": "acme-corp",
+        // ... other organization fields
+      },
+      "users": [
+        {
+          "id": "user-uuid-1",
+          "email": "alice@acme.com",
+          "first_name": "Alice",
+          "last_name": "Admin",
+          "roles": [
+            "Organization Admin",
+            "Member"
+          ],
+          // ... other user fields
+        },
+        {
+          "id": "user-uuid-2",
+          "email": "bob@acme.com",
+          "first_name": "Bob",
+          "last_name": "Analyst",
+          "roles": [
+            "Member",
+            "Data Analyst"
+          ],
+          // ... other user fields
+        }
+      ]
+    }
+    ```
+- **Error Responses**:
+    - `400 Bad Request`: Invalid or missing fields, duplicate organization domain, or user emails already exist.
+    - `500 Internal Server Error`: Unexpected error
+
+
 ### Authentication (`/api/auth`)
 
 #### **User Login**
@@ -32,33 +116,6 @@ Here is the documentation for the API endpoints.
 -   **Error Responses**:
     -   `400 Bad Request`: Missing fields.
     -   `401 Unauthorized`: Invalid credentials or organization.
-
-#### **User Registration**
--   **Endpoint**: `POST /api/auth/register`
--   **Description**: Registers a new user and organization.
--   **Request Body**:
-    ```json
-    {
-      "email": "new.user@example.com",
-      "password": "StrongPassword123!",
-      "first_name": "Jane",
-      "last_name": "Doe",
-      "organization": "new-org-domain"
-    }
-    ```
--   **Success Response (201 Created)**:
-    ```json
-    {
-      "user": {
-        "id": "new-user-uuid",
-        "email": "new.user@example.com",
-        "full_name": "Jane Doe",
-        // ... other user fields
-      }
-    }
-    ```
--   **Error Responses**:
-    -   `400 Bad Request`: Missing fields or user/org already exists.
 
 #### **Refresh Access Token**
 -   **Endpoint**: `POST /api/auth/refresh`

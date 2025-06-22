@@ -9,7 +9,7 @@ class Role(db.Model):
     name = db.Column(db.String(100), nullable=False)
     display_name = db.Column(db.String(200))
     description = db.Column(db.Text)
-    organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False)
+    organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'))
     parent_role_id = db.Column(db.String(36), db.ForeignKey('roles.id'))
     level = db.Column(db.Integer, default=0)
     is_system_role = db.Column(db.Boolean, default=False)
@@ -18,6 +18,7 @@ class Role(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     
     # Relationships
+    permissions = db.relationship('Permission', secondary='role_permissions', backref='roles')
     organization = db.relationship('Organization', backref='roles')
     parent_role = db.relationship('Role', remote_side=[id], backref='child_roles')
     user_roles = db.relationship('UserRole', back_populates='role')
@@ -54,13 +55,28 @@ class Role(db.Model):
         if include_permissions:
             data['permissions'] = [perm.to_dict() for perm in self.get_permissions()]
         return data
+    
+    def clone(self, new_organization_id: str):
+        """Creates a copy of this role for a new organization, including its permissions."""
+        new_role = Role(
+            id=str(uuid.uuid4()),
+            name=self.name,
+            display_name=self.display_name,
+            description=self.description,
+            is_system_role=False, # Cloned roles are not system templates
+            organization_id=new_organization_id
+        )
+        # Copy over the permissions
+        new_role.permissions = self.permissions
+        return new_role
+
 
 class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False)
-    permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), nullable=False)
+    role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), primary_key=True)
+    permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), primary_key=True)
     granted_by = db.Column(db.String(36), db.ForeignKey('users.id'))
     granted_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     is_active = db.Column(db.Boolean, default=True)

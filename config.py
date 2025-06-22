@@ -40,4 +40,4 @@ class ProductionConfig(Config):
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    ENCRYPTION_KEY = 'fYi33R_t2iP80PTZ2R_1n9d5VpGj2N_1aPFrGgO0NhQ='
+    ENCRYPTION_KEY = 'CejMECLCNMP2gbV7ugfAxH6zwo_WKqeF5WHx2_FFRZI='

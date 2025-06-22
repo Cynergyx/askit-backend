@@ -1,4 +1,8 @@
 from flask import request, jsonify, g
+from src.extensions import db
+from src.models.user import User
+from src.services.email_service import EmailService
+from src.services.token_service import TokenService
 from src.services.auth_service import AuthService
 from src.services.sso_service import SSOService
 from src.services.audit_service import AuditService
@@ -110,15 +114,32 @@ class AuthController:
         return jsonify(result), 200
 
     @staticmethod
-    @jwt_required_with_org
-    def logout():
-        """User logout"""
-        AuditService.log_action(
-            user_id=g.current_user.id,
-            organization_id=g.current_organization.id,
-            action='LOGOUT',
-            ip_address=request.remote_addr,
-            user_agent=request.headers.get('User-Agent')
-        )
-        
-        return jsonify({'message': 'Logged out successfully'}), 200
+    def verify_email():
+        token = request.args.get('token')
+        if not token:
+            return jsonify({'message': 'Verification token is missing'}), 400
+
+        user_id = TokenService.verify_token(token, salt='email-verification-salt')
+        if not user_id:
+            return jsonify({'message': 'Invalid or expired verification token'}), 400
+
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        if user.is_verified:
+            return jsonify({'message': 'Email is already verified'}), 200
+
+        user.is_verified = True
+        db.session.commit()
+        return jsonify({'message': 'Email successfully verified. You can now log in.'}), 200
+
+    @staticmethod
+    @jwt_required_with_org # or some other auth to prevent abuse
+    def resend_verification():
+        user = g.current_user
+        if user.is_verified:
+            return jsonify({'message': 'Your email is already verified'}), 400
+
+        EmailService.send_verification_email(user.email, user.id)
+        return jsonify({'message': 'A new verification email has been sent.'}), 200

@@ -23,6 +23,8 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     from src.routes.audit_routes import audit_bp
     from src.routes.database_access_routes import db_access_bp
     from src.routes.data_source_routes import datasource_bp
+    from src.routes.role_request_routes import role_request_bp
+    from src.routes.organization_routes import organization_bp
 
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(user_bp, url_prefix='/api/users')
@@ -30,6 +32,13 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     app.register_blueprint(audit_bp, url_prefix='/api/audit')
     app.register_blueprint(db_access_bp, url_prefix='/api/users')
     app.register_blueprint(datasource_bp, url_prefix='/api/datasources')
+    app.register_blueprint(role_request_bp, url_prefix='/api/roles')
+    app.register_blueprint(organization_bp, url_prefix='/api/organizations')
+
+
+    # Register custom CLI commands
+    from src.commands import seed
+    app.cli.add_command(seed)
 
 
     # Register JWT error handlers

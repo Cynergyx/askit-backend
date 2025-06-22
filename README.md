@@ -32,8 +32,8 @@ This is the backend core for an advanced Identity and Access Management (IAM) pl
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-org/AskIT-backend.git
-    cd AskIT-backend
+    git clone https://github.com/your-org/askit-backend.git
+    cd askit-backend
     ```
 
 2.  **Create and activate a virtual environment:**
@@ -49,7 +49,7 @@ This is the backend core for an advanced Identity and Access Management (IAM) pl
 
 4.  **Configure your environment:**
     - Copy `.env.example` to `.env`.
-    - Fill in your `DATABASE_URL`, `SECRET_KEY`, and `JWT_SECRET_KEY`.
+    - Fill in your `DATABASE_URL`, secrets.
     ```bash
     cp .env.example .env
     # (Edit .env with your values)
@@ -62,7 +62,13 @@ This is the backend core for an advanced Identity and Access Management (IAM) pl
     flask db upgrade
     ```
 
-6.  **Run the development server:**
+6.  **Seed the database with initial data (IMPORTANT):**
+    - This command creates the default organization, admin user, roles, and permissions.
+    ```bash
+    flask seed
+    ```
+
+7.  **Run the development server:**
     ```bash
     flask run
     ```

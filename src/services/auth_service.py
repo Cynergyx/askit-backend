@@ -3,6 +3,8 @@ from werkzeug.security import check_password_hash
 from src.models.user import User
 from src.models.organization import Organization
 from src.services.audit_service import AuditService
+from src.models.role import Role
+from src.services.email_service import EmailService
 from src.extensions import db
 from datetime import datetime
 import uuid
@@ -25,6 +27,9 @@ class AuthService:
         
         if not user.check_password(password):
             return None, "Invalid credentials"
+        
+        if not user.is_verified:
+            return None, "Please verify your email address before logging in."
         
         # Update last login
         user.last_login = datetime.utcnow()
@@ -77,17 +82,11 @@ class AuthService:
     
     @staticmethod
     def register_user(email, password, first_name, last_name, organization_domain):
-        """Register new user"""
+        """Registers a new user under an existing organization."""
         organization = Organization.query.filter_by(domain=organization_domain).first()
         if not organization:
-            # For simplicity, we can create the organization if it doesn't exist
-            organization = Organization(
-                id=str(uuid.uuid4()),
-                name=organization_domain.replace('-', ' ').title(),
-                domain=organization_domain
-            )
-            db.session.add(organization)
-        
+            return None, "Organization not found. Registration is not allowed."
+
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             return None, "Email already registered"
@@ -101,10 +100,18 @@ class AuthService:
             organization_id=organization.id
         )
         user.set_password(password)
+
+        # Assign the default "Member" role
+        member_role = Role.query.filter_by(name='Member', organization_id=organization.id).first()
+        if member_role:
+            user.roles.append(member_role)
         
         db.session.add(user)
         db.session.commit()
-        
+
+        # Send verification email
+        EmailService.send_verification_email(user.email, user.id)
+
         # Log registration
         AuditService.log_action(
             user_id=user.id,
