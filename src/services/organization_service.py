@@ -1,6 +1,6 @@
 from src.extensions import db
 from src.models.organization import Organization
-from src.models.user import User
+from src.models.user import User, UserRole
 from src.models.role import Role
 import uuid
 
@@ -88,7 +88,12 @@ class OrganizationService:
                     new_user.set_password(user_data['password'])
                     
                     # Assign default Member role
-                    new_user.roles.append(member_role)
+                    user_role = UserRole(
+                        user_id=new_user.id,
+                        role_id=member_role.id,
+                        granted_by=new_user.id  # or the admin's id if appropriate
+                    )
+                    db.session.add(user_role)
                     
                     # Assign Organization Admin role if specified
                     if user_data.get('is_admin'):

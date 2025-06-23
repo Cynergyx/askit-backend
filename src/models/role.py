@@ -57,19 +57,18 @@ class Role(db.Model):
         return data
     
     def clone(self, new_organization_id: str):
-        """Creates a copy of this role for a new organization, including its permissions."""
         new_role = Role(
             id=str(uuid.uuid4()),
             name=self.name,
             display_name=self.display_name,
             description=self.description,
-            is_system_role=False, # Cloned roles are not system templates
+            is_system_role=False,
             organization_id=new_organization_id
         )
-        # Copy over the permissions
-        new_role.permissions = self.permissions
+        from src.extensions import db
+        with db.session.no_autoflush:
+            new_role.permissions = self.permissions
         return new_role
-
 
 class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
