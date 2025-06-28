@@ -1,0 +1,47 @@
+from src.extensions import db
+from datetime import datetime
+import uuid
+
+class ChatSession(db.Model):
+    __tablename__ = 'chat_sessions'
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
+    organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False)
+    title = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship('User', back_populates='chat_sessions')
+    organization = db.relationship('Organization')
+    messages = db.relationship('ChatMessage', back_populates='session', cascade='all, delete-orphan', order_by='ChatMessage.created_at')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'title': self.title or f"Chat from {self.created_at.strftime('%Y-%m-%d %H:%M')}",
+            'created_at': self.created_at.isoformat(),
+            'message_count': len(self.messages)
+        }
+
+class ChatMessage(db.Model):
+    __tablename__ = 'chat_messages'
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    session_id = db.Column(db.String(36), db.ForeignKey('chat_sessions.id'), nullable=False)
+    sender = db.Column(db.Enum('user', 'ai', name='chat_sender_type'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    meta = db.Column(db.JSON) # For storing things like sources, query plans, etc.
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    session = db.relationship('ChatSession', back_populates='messages')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'session_id': self.session_id,
+            'sender': self.sender,
+            'content': self.content,
+            'metadata': self.meta,
+            'created_at': self.created_at.isoformat()
+        }

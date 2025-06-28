@@ -1,88 +1,65 @@
 from src.models.user import User, UserRole
-from src.models.role import Role, RolePermission
+from src.models.role import Role
 from src.models.permission import Permission, DataAccessPolicy, DataMaskingPolicy
 from src.services.audit_service import AuditService
 from src.extensions import db
 from sqlalchemy import and_, or_
-import json
+from datetime import datetime
 
 class RBACService:
     @staticmethod
     def check_permission(user_id, permission_name, resource_id=None, context=None):
-        """Check if user has specific permission"""
         user = User.query.get(user_id)
         if not user:
             return False
         
+        # This now gets permission objects, not just names
         user_permissions = user.get_permissions()
-        permission = next((p for p in user_permissions if p.name == permission_name), None)
         
-        if not permission:
-            return False
+        # Check if any assigned permission matches the required name
+        for p in user_permissions:
+            if p.name == permission_name:
+                # Basic permission check is successful.
+                # Advanced: could add context/resource checks here
+                return True
         
-        # Check row-level security conditions
-        if permission.conditions and context:
-            return RBACService._evaluate_conditions(permission.conditions, context)
-        
-        return True
-    
-    @staticmethod
-    def _evaluate_conditions(conditions, context):
-        """Evaluate row-level security conditions"""
-        try:
-            # Simple condition evaluation - in production, use a proper expression evaluator
-            for condition in conditions:
-                field = condition.get('field')
-                operator = condition.get('operator')
-                value = condition.get('value')
-                
-                if field not in context:
-                    return False
-                
-                context_value = context[field]
-                
-                if operator == 'eq' and context_value != value:
-                    return False
-                elif operator == 'ne' and context_value == value:
-                    return False
-                elif operator == 'in' and context_value not in value:
-                    return False
-                elif operator == 'contains' and value not in context_value:
-                    return False
-            
-            return True
-        except Exception:
-            return False
+        return False
     
     @staticmethod
     def assign_role(user_id, role_id, granted_by_user_id, expires_at=None):
-        """Assign role to user"""
         user = User.query.get(user_id)
         role = Role.query.get(role_id)
-        granter = User.query.get(granted_by_user_id)
         
-        if not all([user, role, granter]):
-            return False, "User, role, or granter not found"
-        
+        if not user or not role:
+            return False, "User or Role not found."
+            
+        if role.organization_id != user.organization_id:
+             return False, "Cannot assign role from a different organization."
+
         # Check if granter has permission to assign this role
         if not RBACService.check_permission(granted_by_user_id, 'role.assign'):
-            return False, "Insufficient permissions to assign role"
-        
-        # Check if user already has this role
-        existing = UserRole.query.filter_by(user_id=user_id, role_id=role_id, is_active=True).first()
-        if existing:
-            return False, "User already has this role"
-        
-        user_role = UserRole(
+            return False, "Insufficient permissions to assign roles."
+
+        # Check if user already has an active assignment for this role
+        existing_assignment = UserRole.query.filter_by(
+            user_id=user_id, 
+            role_id=role_id,
+            is_active=True
+        ).filter(or_(UserRole.expires_at == None, UserRole.expires_at > datetime.utcnow())).first()
+
+        if existing_assignment:
+            return False, "User already has this active role."
+
+        # Create new assignment
+        new_assignment = UserRole(
             user_id=user_id,
             role_id=role_id,
-            granted_by=granted_by_user_id,
-            expires_at=expires_at
+            granted_by_user_id=granted_by_user_id,
+            expires_at=datetime.fromisoformat(expires_at) if expires_at else None
         )
-        
-        db.session.add(user_role)
+        db.session.add(new_assignment)
         db.session.commit()
-        
+
         # Log permission change
         AuditService.log_permission_change(
             user_id=granted_by_user_id,
@@ -90,33 +67,33 @@ class RBACService:
             target_user_id=user_id,
             target_role_id=role_id,
             action='GRANT',
-            permission_after={'role': role.name}
+            permission_after={'role': role.name, 'expires_at': expires_at}
         )
         
-        return True, "Role assigned successfully"
-    
+        return True, "Role assigned successfully."
+
     @staticmethod
     def revoke_role(user_id, role_id, revoked_by_user_id):
-        """Revoke role from user"""
-        user_role = UserRole.query.filter_by(
+        # Find the active role assignment
+        assignment = UserRole.query.filter_by(
             user_id=user_id, 
             role_id=role_id, 
             is_active=True
         ).first()
         
-        if not user_role:
-            return False, "User role assignment not found"
-        
+        if not assignment:
+            return False, "User does not have this role or it is already inactive."
+
         # Check if revoker has permission
         if not RBACService.check_permission(revoked_by_user_id, 'role.revoke'):
-            return False, "Insufficient permissions to revoke role"
+            return False, "Insufficient permissions to revoke roles."
         
-        user_role.is_active = False
+        assignment.is_active = False
         db.session.commit()
         
-        # Log permission change
         user = User.query.get(user_id)
         role = Role.query.get(role_id)
+        # Log permission change
         AuditService.log_permission_change(
             user_id=revoked_by_user_id,
             organization_id=user.organization_id,
@@ -126,60 +103,4 @@ class RBACService:
             permission_before={'role': role.name}
         )
         
-        return True, "Role revoked successfully"
-    
-    @staticmethod
-    def get_user_accessible_data(user_id, table_name, base_query=None):
-        """Apply row-level security to data queries"""
-        user = User.query.get(user_id)
-        if not user:
-            return None
-        
-        # Get applicable data access policies
-        policies = DataAccessPolicy.query.filter(
-            and_(
-                DataAccessPolicy.organization_id == user.organization_id,
-                DataAccessPolicy.table_name == table_name,
-                DataAccessPolicy.access_type == 'READ',
-                DataAccessPolicy.is_active == True
-            )
-        ).all()
-        
-        # Apply policies to query (simplified example)
-        filtered_query = base_query
-        for policy in policies:
-            if policy.conditions:
-                # Apply conditions to query
-                for condition in policy.conditions:
-                    field = condition.get('field')
-                    operator = condition.get('operator')
-                    value = condition.get('value')
-                    
-                    if operator == 'eq':
-                        filtered_query = filtered_query.filter(getattr(base_query.column_descriptions[0]['type'], field) == value)
-                    # Add more operators as needed
-        
-        return filtered_query
-    
-    @staticmethod
-    def apply_data_masking(user_id, data, table_name):
-        """Apply data masking policies to query results"""
-        user = User.query.get(user_id)
-        if not user:
-            return data
-        
-        # Get masking policies for this table
-        policies = DataMaskingPolicy.query.filter(
-            and_(
-                DataMaskingPolicy.organization_id == user.organization_id,
-                DataMaskingPolicy.table_name == table_name,
-                DataMaskingPolicy.is_active == True
-            )
-        ).all()
-        
-        if not policies:
-            return data
-        
-        # Apply masking to data
-        from src.services.data_masking_service import DataMaskingService
-        return DataMaskingService.mask_data(data, policies)
+        return True, "Role revoked successfully."

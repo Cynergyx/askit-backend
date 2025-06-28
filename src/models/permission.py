@@ -16,7 +16,13 @@ class Permission(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
-    role_permissions = db.relationship('RolePermission', back_populates='permission')
+    role_permissions = db.relationship('RolePermission', back_populates='permission', overlaps="roles,permissions")
+    roles = db.relationship(
+        'Role',
+        secondary='role_permissions',
+        back_populates='permissions',
+        overlaps="role_permissions,permissions"
+    )
     data_access_policies = db.relationship('DataAccessPolicy', backref='permission')
     
     def to_dict(self):

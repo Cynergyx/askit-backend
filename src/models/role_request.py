@@ -19,7 +19,7 @@ class RoleRequest(db.Model):
     reviewer_notes = db.Column(db.Text)
 
     # Relationships
-    user = db.relationship('User', foreign_keys=[user_id], backref='role_requests')
+    user = db.relationship('User', back_populates='role_requests', foreign_keys=[user_id])
     requested_role = db.relationship('Role', foreign_keys=[requested_role_id])
     reviewed_by = db.relationship('User', foreign_keys=[reviewed_by_id])
     organization = db.relationship('Organization')

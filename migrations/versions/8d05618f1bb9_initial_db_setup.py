@@ -1,8 +1,8 @@
 """Initial DB Setup
 
-Revision ID: 387ba4c82893
+Revision ID: 8d05618f1bb9
 Revises: 
-Create Date: 2025-06-22 08:08:57.617732
+Create Date: 2025-06-28 11:36:59.957113
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '387ba4c82893'
+revision = '8d05618f1bb9'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -110,17 +110,12 @@ def upgrade():
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('display_name', sa.String(length=200), nullable=True),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('organization_id', sa.String(length=36), nullable=False),
-    sa.Column('parent_role_id', sa.String(length=36), nullable=True),
-    sa.Column('level', sa.Integer(), nullable=True),
-    sa.Column('is_system_role', sa.Boolean(), nullable=True),
+    sa.Column('organization_id', sa.String(length=36), nullable=True),
+    sa.Column('is_system_role', sa.Boolean(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ),
-    sa.ForeignKeyConstraint(['parent_role_id'], ['roles.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('name', 'organization_id', name='unique_role_per_org')
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
     sa.Column('id', sa.String(length=36), nullable=False),
@@ -130,10 +125,9 @@ def upgrade():
     sa.Column('first_name', sa.String(length=100), nullable=True),
     sa.Column('last_name', sa.String(length=100), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('is_sso_user', sa.Boolean(), nullable=True),
-    sa.Column('sso_provider', sa.String(length=50), nullable=True),
-    sa.Column('sso_user_id', sa.String(length=255), nullable=True),
     sa.Column('organization_id', sa.String(length=36), nullable=False),
+    sa.Column('is_verified', sa.Boolean(), nullable=False),
+    sa.Column('is_sso_user', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('last_login', sa.DateTime(), nullable=True),
@@ -163,6 +157,16 @@ def upgrade():
     with op.batch_alter_table('audit_logs', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_audit_logs_timestamp'), ['timestamp'], unique=False)
 
+    op.create_table('chat_sessions',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('user_id', sa.String(length=36), nullable=False),
+    sa.Column('organization_id', sa.String(length=36), nullable=False),
+    sa.Column('title', sa.String(length=255), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('permission_change_logs',
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=True),
@@ -181,17 +185,28 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('role_permissions',
-    sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('role_id', sa.String(length=36), nullable=False),
     sa.Column('permission_id', sa.String(length=36), nullable=False),
-    sa.Column('granted_by', sa.String(length=36), nullable=True),
-    sa.Column('granted_at', sa.DateTime(), nullable=True),
-    sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.ForeignKeyConstraint(['granted_by'], ['users.id'], ),
     sa.ForeignKeyConstraint(['permission_id'], ['permissions.id'], ),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('role_id', 'permission_id', name='unique_role_permission')
+    sa.PrimaryKeyConstraint('role_id', 'permission_id')
+    )
+    op.create_table('role_requests',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('user_id', sa.String(length=36), nullable=False),
+    sa.Column('organization_id', sa.String(length=36), nullable=False),
+    sa.Column('requested_role_id', sa.String(length=36), nullable=False),
+    sa.Column('reason', sa.Text(), nullable=True),
+    sa.Column('status', sa.String(length=50), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('reviewed_at', sa.DateTime(), nullable=True),
+    sa.Column('reviewed_by_id', sa.String(length=36), nullable=True),
+    sa.Column('reviewer_notes', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['organization_id'], ['organizations.id'], ),
+    sa.ForeignKeyConstraint(['requested_role_id'], ['roles.id'], ),
+    sa.ForeignKeyConstraint(['reviewed_by_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     op.create_table('user_database_access',
     sa.Column('id', sa.String(length=36), nullable=False),
@@ -212,29 +227,47 @@ def upgrade():
     sa.Column('id', sa.String(length=36), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=False),
     sa.Column('role_id', sa.String(length=36), nullable=False),
-    sa.Column('granted_by', sa.String(length=36), nullable=True),
+    sa.Column('granted_by_user_id', sa.String(length=36), nullable=True),
     sa.Column('granted_at', sa.DateTime(), nullable=True),
     sa.Column('expires_at', sa.DateTime(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.ForeignKeyConstraint(['granted_by'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['granted_by_user_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('user_id', 'role_id', name='unique_user_role')
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('user_roles', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_user_roles_is_active'), ['is_active'], unique=False)
+
+    op.create_table('chat_messages',
+    sa.Column('id', sa.String(length=36), nullable=False),
+    sa.Column('session_id', sa.String(length=36), nullable=False),
+    sa.Column('sender', sa.Enum('user', 'ai', name='chat_sender_type'), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('meta', sa.JSON(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['session_id'], ['chat_sessions.id'], ),
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('chat_messages')
+    with op.batch_alter_table('user_roles', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_user_roles_is_active'))
+
     op.drop_table('user_roles')
     with op.batch_alter_table('user_database_access', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_user_database_access_user_id'))
         batch_op.drop_index(batch_op.f('ix_user_database_access_data_source_id'))
 
     op.drop_table('user_database_access')
+    op.drop_table('role_requests')
     op.drop_table('role_permissions')
     op.drop_table('permission_change_logs')
+    op.drop_table('chat_sessions')
     with op.batch_alter_table('audit_logs', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_audit_logs_timestamp'))
 

@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime, timezone
+from datetime import datetime
 import uuid
 
 class Role(db.Model):
@@ -10,35 +10,32 @@ class Role(db.Model):
     display_name = db.Column(db.String(200))
     description = db.Column(db.Text)
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'))
-    parent_role_id = db.Column(db.String(36), db.ForeignKey('roles.id'))
-    level = db.Column(db.Integer, default=0)
-    is_system_role = db.Column(db.Boolean, default=False)
+    is_system_role = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
-    permissions = db.relationship('Permission', secondary='role_permissions', backref='roles')
     organization = db.relationship('Organization', backref='roles')
-    parent_role = db.relationship('Role', remote_side=[id], backref='child_roles')
-    user_roles = db.relationship('UserRole', back_populates='role')
-    role_permissions = db.relationship('RolePermission', back_populates='role', cascade='all, delete-orphan')
-    
-    __table_args__ = (db.UniqueConstraint('name', 'organization_id', name='unique_role_per_org'),)
-    
-    def get_permissions(self):
-        permissions = [rp.permission for rp in self.role_permissions if rp.is_active]
-        # Inherit from parent roles
-        if self.parent_role:
-            permissions.extend(self.parent_role.get_permissions())
-        return list(set(permissions))
-    
-    def get_all_child_roles(self):
-        children = list(self.child_roles)
-        for child in self.child_roles:
-            children.extend(child.get_all_child_roles())
-        return children
-    
+    users = db.relationship(
+        'User',
+        secondary='user_roles',
+        primaryjoin="Role.id==UserRole.role_id",
+        secondaryjoin="User.id==UserRole.user_id",
+        back_populates='roles',
+        foreign_keys="[UserRole.role_id, UserRole.user_id]",
+        overlaps="role_assignments,user"
+    )
+    permissions = db.relationship(
+        'Permission',
+        secondary='role_permissions',
+        back_populates='roles',
+        overlaps="role_permissions,roles"
+    )
+    role_permissions = db.relationship(
+        'RolePermission',
+        back_populates='role',
+        overlaps="permissions,roles"
+    )
+
     def to_dict(self, include_permissions=False):
         data = {
             'id': self.id,
@@ -46,16 +43,13 @@ class Role(db.Model):
             'display_name': self.display_name,
             'description': self.description,
             'organization_id': self.organization_id,
-            'parent_role_id': self.parent_role_id,
-            'level': self.level,
             'is_system_role': self.is_system_role,
-            'is_active': self.is_active,
             'created_at': self.created_at.isoformat()
         }
         if include_permissions:
-            data['permissions'] = [perm.to_dict() for perm in self.get_permissions()]
+            data['permissions'] = [perm.to_dict() for perm in self.permissions]
         return data
-    
+
     def clone(self, new_organization_id: str):
         new_role = Role(
             id=str(uuid.uuid4()),
@@ -65,24 +59,13 @@ class Role(db.Model):
             is_system_role=False,
             organization_id=new_organization_id
         )
-        from src.extensions import db
-        with db.session.no_autoflush:
-            new_role.permissions = self.permissions
+        new_role.permissions = self.permissions
         return new_role
 
 class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
-    
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), primary_key=True)
     permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), primary_key=True)
-    granted_by = db.Column(db.String(36), db.ForeignKey('users.id'))
-    granted_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    is_active = db.Column(db.Boolean, default=True)
-    
-    # Relationships
-    role = db.relationship('Role', back_populates='role_permissions')
-    permission = db.relationship('Permission', back_populates='role_permissions')
-    granter = db.relationship('User')
-    
-    __table_args__ = (db.UniqueConstraint('role_id', 'permission_id', name='unique_role_permission'),)
+
+    role = db.relationship('Role', back_populates='role_permissions', overlaps="permissions,roles")
+    permission = db.relationship('Permission', back_populates='role_permissions', overlaps="roles,permissions")
