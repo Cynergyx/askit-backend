@@ -43,3 +43,11 @@ sudo service redis-server stop
     ```bash
     flask seed
     ```
+
+
+# Git Issue Fix
+```bash
+find .git/objects/ -type f -empty -delete
+git fetch -p
+git fsck --full
+```
