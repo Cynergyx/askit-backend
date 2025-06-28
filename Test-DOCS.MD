@@ -44,6 +44,7 @@ sudo service redis-server stop
     flask seed
     ```
 
+---
 
 # Git Issue Fix
 ```bash
@@ -51,3 +52,5 @@ find .git/objects/ -type f -empty -delete
 git fetch -p
 git fsck --full
 ```
+
+---
