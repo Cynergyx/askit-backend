@@ -16,8 +16,8 @@ class Role(db.Model):
     
     organization = db.relationship('Organization', backref='roles')
     
-    # This relationship goes through the UserRole association object
-    user_assignments = db.relationship('UserRole', back_populates='role', cascade="all, delete-orphan", lazy="joined")
+    # This relationship goes through the UserRole association object.
+    user_assignments = db.relationship('UserRole', back_populates='role', cascade="all, delete-orphan")
     
     permissions = db.relationship(
         'Permission',
@@ -34,6 +34,7 @@ class Role(db.Model):
             'description': self.description,
             'organization_id': self.organization_id,
             'is_system_role': self.is_system_role,
+            'is_active': self.is_active,
             'created_at': self.created_at.isoformat()
         }
         if include_permissions:

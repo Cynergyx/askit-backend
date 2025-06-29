@@ -4,11 +4,10 @@ from datetime import datetime
 import uuid
 
 class UserRole(db.Model):
-    # ... (This model is already correct from the previous step)
     __tablename__ = 'user_roles'
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
-    role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False)
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
+    role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False, index=True)
     granted_by_user_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     granted_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=True)
@@ -38,7 +37,7 @@ class User(db.Model):
     
     organization = db.relationship('Organization', backref='users')
     
-    # Correctly defined relationship to the association object
+    # Corrected relationship to the association object. lazy="joined" is a performance optimization.
     role_assignments = db.relationship('UserRole', foreign_keys=[UserRole.user_id], back_populates='user', cascade="all, delete-orphan", lazy="joined")
     
     audit_logs = db.relationship('AuditLog', backref='user', foreign_keys='AuditLog.user_id')
@@ -52,7 +51,8 @@ class User(db.Model):
         active_roles = []
         for assignment in self.role_assignments:
             if assignment.is_active and (assignment.expires_at is None or assignment.expires_at > datetime.utcnow()):
-                active_roles.append(assignment.role)
+                if assignment.role:
+                    active_roles.append(assignment.role)
         return active_roles
 
     @property
@@ -75,7 +75,7 @@ class User(db.Model):
         """Get active permission objects."""
         permissions = set()
         for role in self.get_roles():
-            if role.is_active:
+            if role and role.is_active:
                 for perm in role.permissions:
                     permissions.add(perm)
         return list(permissions)

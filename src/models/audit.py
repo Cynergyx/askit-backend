@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class AuditLog(db.Model):
@@ -14,12 +14,24 @@ class AuditLog(db.Model):
     details = db.Column(db.JSON)
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.now(timezone.utc), index=True)
     session_id = db.Column(db.String(100))
     
     # Relationships
     organization = db.relationship('Organization', backref='audit_logs')
     # user relationship is defined via backref in User model
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'organization_id': self.organization_id,
+            'action': self.action,
+            'resource_type': self.resource_type,
+            'resource_id': self.resource_id,
+            'details': self.details,
+            'created_at': self.timestamp.isoformat() if self.timestamp else None,
+        }
 
 class PermissionChangeLog(db.Model):
     __tablename__ = 'permission_change_logs'

@@ -52,7 +52,7 @@ class UserController:
         if not user:
             return jsonify({'message': 'User not found'}), 404
         
-        return jsonify({'user': user.to_dict(include_sensitive=True)}), 200
+        return jsonify({'user': user.to_dict()}), 200
     
     @staticmethod
     @jwt_required_with_org

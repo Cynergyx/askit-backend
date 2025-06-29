@@ -8,7 +8,7 @@ def jwt_required_with_org(f):
     """JWT required with organization validation"""
     @wraps(f)
     def decorated(*args, **kwargs):
-        try:
+        # try:
             verify_jwt_in_request()
             
             # Get user and organization info from JWT
@@ -33,8 +33,8 @@ def jwt_required_with_org(f):
             
             return f(*args, **kwargs)
             
-        except Exception as e:
-            return jsonify({'message': 'Authentication failed'}), 401
+        # except Exception as e:
+        #     return jsonify({'message': 'Authentication failed'}), 401
     
     return decorated
 
