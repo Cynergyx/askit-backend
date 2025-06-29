@@ -11,19 +11,15 @@ class Permission(db.Model):
     description = db.Column(db.Text)
     resource = db.Column(db.String(100), nullable=False)
     action = db.Column(db.String(50), nullable=False)
-    conditions = db.Column(db.JSON)  # For row-level security conditions
+    conditions = db.Column(db.JSON)
     is_system_permission = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
-    # Relationships
-    role_permissions = db.relationship('RolePermission', back_populates='permission', overlaps="roles,permissions")
     roles = db.relationship(
         'Role',
         secondary='role_permissions',
-        back_populates='permissions',
-        overlaps="role_permissions,permissions"
+        back_populates='permissions'
     )
-    data_access_policies = db.relationship('DataAccessPolicy', backref='permission')
     
     def to_dict(self):
         return {

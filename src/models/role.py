@@ -15,25 +15,15 @@ class Role(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     organization = db.relationship('Organization', backref='roles')
-    users = db.relationship(
-        'User',
-        secondary='user_roles',
-        primaryjoin="Role.id==UserRole.role_id",
-        secondaryjoin="User.id==UserRole.user_id",
-        back_populates='roles',
-        foreign_keys="[UserRole.role_id, UserRole.user_id]",
-        overlaps="role_assignments,user"
-    )
+    
+    # This relationship goes through the UserRole association object
+    user_assignments = db.relationship('UserRole', back_populates='role', cascade="all, delete-orphan", lazy="joined")
+    
     permissions = db.relationship(
         'Permission',
         secondary='role_permissions',
         back_populates='roles',
-        overlaps="role_permissions,roles"
-    )
-    role_permissions = db.relationship(
-        'RolePermission',
-        back_populates='role',
-        overlaps="permissions,roles"
+        lazy="joined"
     )
 
     def to_dict(self, include_permissions=False):
@@ -66,6 +56,3 @@ class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
     role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), primary_key=True)
     permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), primary_key=True)
-
-    role = db.relationship('Role', back_populates='role_permissions', overlaps="permissions,roles")
-    permission = db.relationship('Permission', back_populates='role_permissions', overlaps="roles,permissions")

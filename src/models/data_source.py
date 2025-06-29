@@ -8,8 +8,8 @@ class DataSource(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False, index=True)
     
-    name = db.Column(db.String(100), nullable=False) # A user-friendly name, e.g., "Production Sales DB"
-    type = db.Column(db.String(50), nullable=False) # e.g., 'postgresql', 'mysql', 'snowflake'
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
     
     host = db.Column(db.String(255))
     port = db.Column(db.Integer)
@@ -26,12 +26,9 @@ class DataSource(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     organization = db.relationship('Organization', backref='data_sources')
+    schema_metadata = db.relationship('SchemaMetadata', back_populates='data_source', cascade='all, delete-orphan')
 
     def to_dict(self):
-        """
-        Returns a dictionary representation of the data source.
-        IMPORTANT: This does NOT include the encrypted password for security.
-        """
         return {
             'id': self.id,
             'organization_id': self.organization_id,
@@ -43,4 +40,26 @@ class DataSource(db.Model):
             'username': self.username,
             'extra_params': self.extra_params,
             'created_at': self.created_at.isoformat()
+        }
+
+class SchemaMetadata(db.Model):
+    __tablename__ = 'schema_metadata'
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    data_source_id = db.Column(db.String(36), db.ForeignKey('data_sources.id'), nullable=False)
+    table_name = db.Column(db.String(255), nullable=False)
+    column_name = db.Column(db.String(255), nullable=True) # Null if it's a table-level description
+    description = db.Column(db.Text, nullable=True)
+    
+    data_source = db.relationship('DataSource', back_populates='schema_metadata')
+    
+    __table_args__ = (db.UniqueConstraint('data_source_id', 'table_name', 'column_name', name='uq_schema_metadata_target'),)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'data_source_id': self.data_source_id,
+            'table_name': self.table_name,
+            'column_name': self.column_name,
+            'description': self.description
         }

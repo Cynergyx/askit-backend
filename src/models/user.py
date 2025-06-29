@@ -4,19 +4,18 @@ from datetime import datetime
 import uuid
 
 class UserRole(db.Model):
+    # ... (This model is already correct from the previous step)
     __tablename__ = 'user_roles'
-    
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False)
-    
     granted_by_user_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     granted_at = db.Column(db.DateTime, default=datetime.utcnow)
-    expires_at = db.Column(db.DateTime, nullable=True) # For temporary roles
+    expires_at = db.Column(db.DateTime, nullable=True)
     is_active = db.Column(db.Boolean, default=True, index=True)
 
     user = db.relationship('User', foreign_keys=[user_id], back_populates='role_assignments')
-    role = db.relationship('Role', foreign_keys=[role_id])
+    role = db.relationship('Role', foreign_keys=[role_id], back_populates='user_assignments')
     granted_by = db.relationship('User', foreign_keys=[granted_by_user_id])
 
 
@@ -38,28 +37,24 @@ class User(db.Model):
     last_login = db.Column(db.DateTime)
     
     organization = db.relationship('Organization', backref='users')
-    role_assignments = db.relationship('UserRole', foreign_keys=[UserRole.user_id], back_populates='user', cascade="all, delete-orphan")
-    roles = db.relationship(
-        'Role',
-        secondary='user_roles',
-        primaryjoin="User.id==UserRole.user_id",
-        secondaryjoin="Role.id==UserRole.role_id",
-        back_populates='users',
-        foreign_keys="[UserRole.user_id, UserRole.role_id]"
-    )
+    
+    # Correctly defined relationship to the association object
+    role_assignments = db.relationship('UserRole', foreign_keys=[UserRole.user_id], back_populates='user', cascade="all, delete-orphan", lazy="joined")
+    
     audit_logs = db.relationship('AuditLog', backref='user', foreign_keys='AuditLog.user_id')
     database_accesses = db.relationship('UserDatabaseAccess', back_populates='user', cascade='all, delete-orphan', lazy='dynamic', foreign_keys='UserDatabaseAccess.user_id')
     role_requests = db.relationship('RoleRequest', back_populates='user', foreign_keys='RoleRequest.user_id', lazy=True)
     chat_sessions = db.relationship('ChatSession', back_populates='user', cascade='all, delete-orphan')
 
-
     @property
-    def active_roles(self):
-        return [assignment.role for assignment in self.role_assignments if assignment.is_active and (assignment.expires_at is None or assignment.expires_at > datetime.utcnow())]
+    def roles(self):
+        """Returns a list of active Role objects."""
+        active_roles = []
+        for assignment in self.role_assignments:
+            if assignment.is_active and (assignment.expires_at is None or assignment.expires_at > datetime.utcnow()):
+                active_roles.append(assignment.role)
+        return active_roles
 
-    def get_roles(self):
-        return self.active_roles
-    
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -73,9 +68,11 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
     
     def get_roles(self):
+        """Get active role objects."""
         return self.roles
     
     def get_permissions(self):
+        """Get active permission objects."""
         permissions = set()
         for role in self.get_roles():
             if role.is_active:
@@ -101,6 +98,5 @@ class User(db.Model):
             data['roles'] = [role.to_dict() for role in self.get_roles()]
             data['permissions'] = list(set([perm.name for perm in self.get_permissions()]))
         if include_db_access:
-            # Note: .all() executes the query on the dynamic relationship
             data['database_accesses'] = [access.to_dict() for access in self.database_accesses.all()]
         return data

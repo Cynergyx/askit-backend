@@ -1,10 +1,10 @@
 from flask import request, jsonify, g
 from src.models.chat import ChatSession, ChatMessage
-from src.models.user_database_access import UserDatabaseAccess
 from src.extensions import db
 from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.services.audit_service import AuditService
+from src.services.schema_service import SchemaService
 from src.ai.main import AICompute
 
 class ChatController:
@@ -69,19 +69,26 @@ class ChatController:
             return jsonify({'message': 'Query is required'}), 400
 
         # 1. Save user's message
-        user_message = ChatMessage(
-            session_id=session.id,
-            sender='user',
-            content=user_query
-        )
+        user_message = ChatMessage(session_id=session.id, sender='user', content=user_query)
         db.session.add(user_message)
 
-        # 2. Get user's database credentials
+        # 2. Get user's database credentials AND enriched schemas
         db_accesses = g.current_user.database_accesses.all()
-        db_credentials = [access.to_dict() for access in db_accesses]
-
-        if not db_credentials:
+        if not db_accesses:
             return jsonify({'message': 'You do not have access to any databases to query.'}), 403
+
+        db_credentials = []
+        enriched_schemas = {}
+        for access in db_accesses:
+            db_credentials.append(access.to_dict())
+            try:
+                enriched_schemas[access.data_source_id] = SchemaService.get_enriched_schema(access.data_source_id)
+            
+            except Exception as e:
+                # If a schema fails to load, we can decide to fail or just log and continue
+                print(f"Warning: Could not load schema for data source {access.data_source_id}: {e}")
+                enriched_schemas[access.data_source_id] = {"error": "Could not load schema"}
+
 
         # 3. Get chat history for context
         # We limit history to prevent overly large payloads to the AI
@@ -94,21 +101,17 @@ class ChatController:
                 chat_id=session.id,
                 user_query=user_query,
                 db_credentials=db_credentials,
+                enriched_schemas=enriched_schemas,
                 chat_history=[msg.to_dict() for msg in chat_history]
             )
         except Exception as e:
             # Log the error and return a friendly message
-            db.session.rollback() # Rollback the user message if AI fails
+            db.session.rollback()
             print(f"AI processing failed: {e}")
             return jsonify({'message': 'An error occurred while processing your request with the AI agent.'}), 500
 
         # 5. Save AI's response
-        ai_message = ChatMessage(
-            session_id=session.id,
-            sender='ai',
-            content=ai_response_content,
-            metadata=ai_metadata
-        )
+        ai_message = ChatMessage(session_id=session.id, sender='ai', content=ai_response_content, metadata=ai_metadata)
         db.session.add(ai_message)
 
         # 6. Commit transaction
