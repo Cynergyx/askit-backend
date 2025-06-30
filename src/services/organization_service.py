@@ -1,3 +1,4 @@
+from flask import g
 from src.extensions import db
 from src.models.organization import Organization
 from src.models.user import User, UserRole
@@ -17,14 +18,18 @@ class OrganizationService:
         if not org_data.get('name') or not org_data.get('domain'):
             return None, "Organization data must include 'name' and 'domain'."
 
+        # The Super Admin performing this action is the granter.
+        granter_id = g.current_user.id
+
         try:
-            with db.session.begin_nested():
+            # Using with db.session.begin() is a modern and safe way to handle transactions.
+            with db.session.begin():
                 if Organization.query.filter_by(domain=org_data['domain']).first():
-                    return None, f"Organization with domain '{org_data['domain']}' already exists."
+                    raise ValueError(f"Organization with domain '{org_data['domain']}' already exists.")
                 
                 user_emails = [user['email'] for user in payload['users']]
                 if User.query.filter(User.email.in_(user_emails)).first():
-                    return None, "One or more user emails already exist in the system."
+                    raise ValueError("One or more user emails already exist in the system.")
 
                 new_org = Organization(id=str(uuid.uuid4()), name=org_data['name'], domain=org_data['domain'])
                 db.session.add(new_org)
@@ -33,6 +38,9 @@ class OrganizationService:
                 member_template = Role.query.filter_by(name='Member', is_system_role=True).first()
                 if not admin_template or not member_template:
                     raise Exception("System roles 'Organization Admin' or 'Member' not found. Run `flask seed`.")
+
+                # Flush to get new_org.id before cloning roles
+                db.session.flush()
 
                 org_admin_role = admin_template.clone(new_org.id)
                 member_role = member_template.clone(new_org.id)
@@ -57,22 +65,29 @@ class OrganizationService:
                         is_verified=True
                     )
                     new_user.set_password(user_data['password'])
-                    new_user.roles.append(member_role)
+                    
+                    member_assignment = UserRole(role=member_role, granted_by_user_id=granter_id)
+                    new_user.role_assignments.append(member_assignment)
+                    
                     if user_data.get('is_admin'):
-                        new_user.roles.append(org_admin_role)
+                        admin_assignment = UserRole(role=org_admin_role, granted_by_user_id=granter_id)
+                        new_user.role_assignments.append(admin_assignment)
+                    
                     for role_name in user_data.get('roles', []):
-                        if role_name in role_lookup and role_lookup[role_name] not in new_user.roles:
-                            new_user.roles.append(role_lookup[role_name])
+                        if role_name in role_lookup:
+                            assigned_roles = [a.role for a in new_user.role_assignments]
+                            if role_lookup[role_name] not in assigned_roles:
+                                custom_assignment = UserRole(role=role_lookup[role_name], granted_by_user_id=granter_id)
+                                new_user.role_assignments.append(custom_assignment)
+                    
                     db.session.add(new_user)
                     created_users.append(new_user)
 
-            db.session.commit()
-            
             final_users = [user.to_dict(include_details=True) for user in created_users]
             return {'organization': new_org.to_dict(), 'users': final_users}, None
 
-        except Exception as e:
-            db.session.rollback()
+        except (ValueError, Exception) as e:
+            # The 'with' block handles the rollback on error
             import logging
             logging.exception("Onboarding failed")
             return None, f"An unexpected error occurred during onboarding: {str(e)}"

@@ -1,6 +1,6 @@
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 from werkzeug.security import check_password_hash
-from src.models.user import User
+from src.models.user import User, UserRole
 from src.models.organization import Organization
 from src.services.audit_service import AuditService
 from src.models.role import Role
@@ -87,24 +87,24 @@ class AuthService:
         if not organization:
             return None, "Organization not found. Registration is not allowed."
 
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
+        if User.query.filter_by(email=email).first():
             return None, "Email already registered"
         
         user = User(
             id=str(uuid.uuid4()),
             email=email,
-            username=email.split('@')[0] + str(uuid.uuid4())[:4], # Ensure username is unique
+            username=email.split('@')[0] + str(uuid.uuid4())[:4],
             first_name=first_name,
             last_name=last_name,
             organization_id=organization.id
         )
         user.set_password(password)
 
-        # Assign the default "Member" role
+        # Assign the default "Member" role for that organization
         member_role = Role.query.filter_by(name='Member', organization_id=organization.id).first()
         if member_role:
-            user.roles.append(member_role)
+            member_assignment = UserRole(role=member_role, granted_by_user_id=None)
+            user.role_assignments.append(member_assignment)
         
         db.session.add(user)
         db.session.commit()
