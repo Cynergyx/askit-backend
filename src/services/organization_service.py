@@ -23,6 +23,10 @@ class OrganizationService:
 
         try:
             # Using with db.session.begin() is a modern and safe way to handle transactions.
+            if db.session.is_active:
+                db.session.rollback()
+            else:
+                db.session.begin_nested()
             with db.session.begin():
                 if Organization.query.filter_by(domain=org_data['domain']).first():
                     raise ValueError(f"Organization with domain '{org_data['domain']}' already exists.")
@@ -87,7 +91,6 @@ class OrganizationService:
             return {'organization': new_org.to_dict(), 'users': final_users}, None
 
         except (ValueError, Exception) as e:
-            # The 'with' block handles the rollback on error
             import logging
             logging.exception("Onboarding failed")
             return None, f"An unexpected error occurred during onboarding: {str(e)}"

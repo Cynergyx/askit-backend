@@ -6,7 +6,7 @@ from src.services.audit_service import AuditService
 from src.models.role import Role
 from src.services.email_service import EmailService
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from flask import request
 
@@ -32,7 +32,7 @@ class AuthService:
             return None, "Please verify your email address before logging in."
         
         # Update last login
-        user.last_login = datetime.utcnow()
+        user.last_login = datetime.now(timezone.utc)
         db.session.commit()
         
         # Create tokens
