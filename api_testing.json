@@ -1,120 +1,1406 @@
 {
-  "info": {
-    "_postman_id": "askit-backend-api-collection",
-    "name": "Askit Backend API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Postman collection for all API routes in the askit-backend project."
-  },
-  "item": [
-    {
-      "name": "Audit",
-      "item": [
-        {
-          "name": "Get Audit Logs",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": { "raw": "{{base_url}}/logs", "host": ["{{base_url}}"], "path": ["logs"] }
-          }
-        },
-        {
-          "name": "Get Permission Changes",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": { "raw": "{{base_url}}/permissions", "host": ["{{base_url}}"], "path": ["permissions"] }
-          }
-        },
-        {
-          "name": "Get Audit Summary",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": { "raw": "{{base_url}}/summary", "host": ["{{base_url}}"], "path": ["summary"] }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Auth",
-      "item": [
-        { "name": "Login", "request": { "method": "POST", "header": [], "body": { "mode": "raw", "raw": "{\n  \"email\": \"\",\n  \"password\": \"\"\n}" }, "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] } } },
-        { "name": "Register", "request": { "method": "POST", "header": [], "body": { "mode": "raw", "raw": "{\n  \"email\": \"\",\n  \"password\": \"\",\n  \"name\": \"\"\n}" }, "url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] } } },
-        { "name": "Refresh", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/refresh", "host": ["{{base_url}}"], "path": ["refresh"] } } },
-        { "name": "SSO Login", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/sso", "host": ["{{base_url}}"], "path": ["sso"] } } },
-        { "name": "Logout", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] } } },
-        { "name": "Verify Email", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/verify-email", "host": ["{{base_url}}"], "path": ["verify-email"] } } },
-        { "name": "Resend Verification", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/resend-verification", "host": ["{{base_url}}"], "path": ["resend-verification"] } } }
-      ]
-    },
-    {
-      "name": "Chat",
-      "item": [
-        { "name": "Create Chat Session", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/sessions", "host": ["{{base_url}}"], "path": ["sessions"] } } },
-        { "name": "Get User Chat Sessions", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/sessions", "host": ["{{base_url}}"], "path": ["sessions"] } } },
-        { "name": "Get Chat History", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/sessions/:session_id/messages", "host": ["{{base_url}}"], "path": ["sessions", ":session_id", "messages"] } } },
-        { "name": "Post Message", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/sessions/:session_id/messages", "host": ["{{base_url}}"], "path": ["sessions", ":session_id", "messages"] } } }
-      ]
-    },
-    {
-      "name": "Data Source",
-      "item": [
-        { "name": "List Data Sources", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] } } },
-        { "name": "Bulk Upload", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/bulk-upload", "host": ["{{base_url}}"], "path": ["bulk-upload"] } } },
-        { "name": "Get Enriched Schema", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/:data_source_id/schema", "host": ["{{base_url}}"], "path": [":data_source_id", "schema"] } } },
-        { "name": "Update Schema Description", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/:data_source_id/schema/description", "host": ["{{base_url}}"], "path": [":data_source_id", "schema", "description"] } } }
-      ]
-    },
-    {
-      "name": "Database Access",
-      "item": [
-        { "name": "Get Access List", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/:user_id/database-access", "host": ["{{base_url}}"], "path": [":user_id", "database-access"] } } },
-        { "name": "Grant Access", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/:user_id/database-access", "host": ["{{base_url}}"], "path": [":user_id", "database-access"] } } },
-        { "name": "Revoke Access", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/:user_id/database-access/:access_id", "host": ["{{base_url}}"], "path": [":user_id", "database-access", ":access_id"] } } }
-      ]
-    },
-    {
-      "name": "Organization",
-      "item": [
-        { "name": "Onboard Organization", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/onboard", "host": ["{{base_url}}"], "path": ["onboard"] } } }
-      ]
-    },
-    {
-      "name": "Role Request",
-      "item": [
-        { "name": "Request Role", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/requests", "host": ["{{base_url}}"], "path": ["requests"] } } },
-        { "name": "List Requests", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/requests", "host": ["{{base_url}}"], "path": ["requests"] } } },
-        { "name": "Approve Request", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/requests/:request_id/approve", "host": ["{{base_url}}"], "path": ["requests", ":request_id", "approve"] } } },
-        { "name": "Deny Request", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/requests/:request_id/deny", "host": ["{{base_url}}"], "path": ["requests", ":request_id", "deny"] } } }
-      ]
-    },
-    {
-      "name": "Role",
-      "item": [
-        { "name": "Get Roles", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] } } },
-        { "name": "Create Role", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] } } },
-        { "name": "Get Role", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/:role_id", "host": ["{{base_url}}"], "path": [":role_id"] } } },
-        { "name": "Update Role", "request": { "method": "PUT", "header": [], "url": { "raw": "{{base_url}}/:role_id", "host": ["{{base_url}}"], "path": [":role_id"] } } },
-        { "name": "Delete Role", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/:role_id", "host": ["{{base_url}}"], "path": [":role_id"] } } },
-        { "name": "Get Permissions", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/permissions", "host": ["{{base_url}}"], "path": ["permissions"] } } },
-        { "name": "Assign Permission", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/:role_id/permissions", "host": ["{{base_url}}"], "path": [":role_id", "permissions"] } } },
-        { "name": "Revoke Permission", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/:role_id/permissions", "host": ["{{base_url}}"], "path": [":role_id", "permissions"] } } }
-      ]
-    },
-    {
-      "name": "User",
-      "item": [
-        { "name": "Get Users", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] } } },
-        { "name": "Create User", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/", "host": ["{{base_url}}"], "path": [""] } } },
-        { "name": "Get User", "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/:user_id", "host": ["{{base_url}}"], "path": [":user_id"] } } },
-        { "name": "Update User", "request": { "method": "PUT", "header": [], "url": { "raw": "{{base_url}}/:user_id", "host": ["{{base_url}}"], "path": [":user_id"] } } },
-        { "name": "Delete User", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/:user_id", "host": ["{{base_url}}"], "path": [":user_id"] } } },
-        { "name": "Assign Role", "request": { "method": "POST", "header": [], "url": { "raw": "{{base_url}}/:user_id/roles", "host": ["{{base_url}}"], "path": [":user_id", "roles"] } } },
-        { "name": "Revoke Role", "request": { "method": "DELETE", "header": [], "url": { "raw": "{{base_url}}/:user_id/roles", "host": ["{{base_url}}"], "path": [":user_id", "roles"] } } }
-      ]
-    }
-  ],
-  "variable": [
-    { "key": "base_url", "value": "http://localhost:5000/api" }
-  ]
+	"info": {
+		"_postman_id": "c9a2e1d0-1a1b-4b2c-8d3e-9f4a5b6c7d8e",
+		"name": "Cynergyx-Askit API (Complete)",
+		"description": "Exhaustive API collection for the Cynergyx-Askit backend application. Includes automated variable setting for a smooth workflow.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"description": "User authentication and registration.",
+			"item": [
+				{
+					"name": "Login Super Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jwt_super_admin\", jsonData.access_token);",
+									"    console.log(\"Set Super Admin JWT.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"super@admin.com\",\n    \"password\": \"password\",\n    \"organization\": \"superorg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as the Super Admin (credentials from .env). This sets the `jwt_super_admin` variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Login Org Admin/User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jwt_user\", jsonData.access_token);",
+									"    pm.collectionVariables.set(\"user_id\", jsonData.user.id);",
+									"    pm.collectionVariables.set(\"org_id\", jsonData.user.organization_id);",
+									"    console.log(\"Set User JWT, User ID, and Org ID from login.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@innovatecorp.com\",\n    \"password\": \"StrongPassword123!\",\n    \"organization\": \"innovatecorp.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login as a regular organization user or admin. This sets the `jwt_user` and other related variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Register New User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"new.user@innovatecorp.com\",\n    \"password\": \"VeryStrongPassword123!\",\n    \"first_name\": \"New\",\n    \"last_name\": \"User\",\n    \"organization\": \"innovatecorp.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organization",
+			"description": "Onboarding and managing organizations.",
+			"item": [
+				{
+					"name": "Onboard New Organization",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"onboarded_org_id\", jsonData.organization.id);",
+									"    pm.collectionVariables.set(\"org_admin_id\", jsonData.users.find(u => u.email === 'admin@innovatecorp.com').id);",
+									"    pm.collectionVariables.set(\"member_user_id\", jsonData.users.find(u => u.email === 'analyst@innovatecorp.com').id);",
+									"    console.log(\"Set onboarded_org_id, org_admin_id, and member_user_id from response.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_super_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"organization\": {\n        \"name\": \"Innovate Corp\",\n        \"domain\": \"innovatecorp.com\"\n    },\n    \"roles\": [\n        { \"name\": \"Data Analyst\", \"description\": \"Can view dashboards and run queries.\" },\n        { \"name\": \"Project Manager\", \"description\": \"Manages projects and users.\" }\n    ],\n    \"users\": [\n        {\n            \"email\": \"admin@innovatecorp.com\",\n            \"password\": \"StrongPassword123!\",\n            \"first_name\": \"Org\",\n            \"last_name\": \"Admin\",\n            \"is_admin\": true\n        },\n        {\n            \"email\": \"analyst@innovatecorp.com\",\n            \"password\": \"AnotherPassword456!\",\n            \"first_name\": \"Data\",\n            \"last_name\": \"Person\",\n            \"is_admin\": false,\n            \"roles\": [\"Data Analyst\"]\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/organizations/onboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"organizations",
+								"onboard"
+							]
+						},
+						"description": "Requires Super Admin JWT. Onboards a new company."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"description": "CRUD operations for users.",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users?search=admin",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "admin"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"new.hire@innovatecorp.com\",\n    \"first_name\": \"New\",\n    \"last_name\": \"Hire\",\n    \"password\": \"DefaultPassword123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Data\",\n    \"last_name\": \"Analyst\",\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Soft)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Roles & Permissions",
+			"description": "Managing roles and their associated permissions.",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    var pmRole = jsonData.roles.find(r => r.name === 'Project Manager');",
+									"    if (pmRole) {",
+									"        pm.collectionVariables.set(\"role_id_pm\", pmRole.id);",
+									"        console.log(\"Set role_id_pm from response.\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Finance Viewer\",\n    \"display_name\": \"Finance Viewer\",\n    \"description\": \"Can view financial reports.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Manages projects, users, and their associated tasks.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Role to User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Role from User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role Requests",
+			"description": "Workflow for users to request additional roles.",
+			"item": [
+				{
+					"name": "User Requests a Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"role_request_id\", jsonData.id);",
+									"    console.log(\"Set role_request_id from response.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\",\n    \"reason\": \"I need to manage the Q4 project tasks.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Lists Pending Requests",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests?status=PENDING",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "PENDING"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Approves Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Approved for Q4 project.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests/{{role_request_id}}/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests",
+								"{{role_request_id}}",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Denies Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"This role is not required for your current duties.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests/{{role_request_id}}/deny",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests",
+								"{{role_request_id}}",
+								"deny"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Data Sources & Access",
+			"description": "Onboarding external databases and managing user access.",
+			"item": [
+				{
+					"name": "List Data Sources",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/datasources/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"datasources",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Upload Data Sources",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"data_source_id\", jsonData.onboarded_ids[0]);",
+									"    console.log(\"Set data_source_id from response.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n        \"name\": \"Production Postgres DB\",\n        \"type\": \"postgresql\",\n        \"host\": \"localhost\",\n        \"port\": 5432,\n        \"database_name\": \"rbac_db\",\n        \"username\": \"user\",\n        \"password\": \"password\"\n    }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/datasources/bulk-upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"datasources",
+								"bulk-upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Grant DB Access to User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data_source_id\": \"{{data_source_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"database-access"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's DB Access List",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"database-access"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Enriched Schema",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/datasources/{{data_source_id}}/schema",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"datasources",
+								"{{data_source_id}}",
+								"schema"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Schema Description",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"table_name\": \"users\",\n    \"column_name\": \"email\",\n    \"description\": \"The primary contact email for a user. Must be unique.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/datasources/{{data_source_id}}/schema/description",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"datasources",
+								"{{data_source_id}}",
+								"schema",
+								"description"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat & AI",
+			"description": "Interacting with the AI agent.",
+			"item": [
+				{
+					"name": "Create Chat Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"session_id\", jsonData.id);",
+									"    console.log(\"Set session_id from response.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Q4 Sales Analysis\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/sessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Chat Sessions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/sessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Message to AI",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"query\": \"Show me the last 5 users to log in.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/sessions/{{session_id}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"sessions",
+								"{{session_id}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chat History",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/sessions/{{session_id}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"sessions",
+								"{{session_id}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Audit",
+			"description": "Endpoints for reviewing audit trails.",
+			"item": [
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/audit/logs?limit=10&action=LOGIN",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "action",
+									"value": "LOGIN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permission Change Logs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/audit/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Summary",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/audit/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_user}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://127.0.0.1:5000"
+		},
+		{
+			"key": "jwt_super_admin",
+			"value": ""
+		},
+		{
+			"key": "jwt_user",
+			"value": ""
+		},
+		{
+			"key": "org_id",
+			"value": ""
+		},
+		{
+			"key": "user_id",
+			"value": ""
+		},
+		{
+			"key": "member_user_id",
+			"value": ""
+		},
+		{
+			"key": "org_admin_id",
+			"value": ""
+		},
+		{
+			"key": "data_source_id",
+			"value": ""
+		},
+		{
+			"key": "session_id",
+			"value": ""
+		},
+		{
+			"key": "role_id_pm",
+			"value": ""
+		},
+		{
+			"key": "role_request_id",
+			"value": ""
+		}
+	]
 }
