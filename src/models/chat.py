@@ -31,17 +31,24 @@ class ChatMessage(db.Model):
     session_id = db.Column(db.String(36), db.ForeignKey('chat_sessions.id'), nullable=False)
     sender = db.Column(db.Enum('user', 'ai', name='chat_sender_type'), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    meta = db.Column(db.JSON) # For storing things like sources, query plans, etc.
+    metadata = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     session = db.relationship('ChatSession', back_populates='messages')
 
     def to_dict(self):
-        return {
-            'id': self.id,
-            'session_id': self.session_id,
-            'sender': self.sender,
-            'content': self.content,
-            'metadata': self.meta,
-            'created_at': self.created_at.isoformat()
+        """
+        Returns a dictionary representation of the chat message
+        in the specified format.
+        """
+        role = 'assistant' if self.sender == 'ai' else 'user'
+        
+        message = {
+            'role': role,
+            'content': self.content
         }
+        
+        if self.metadata:
+            message['metadata'] = self.metadata
+            
+        return message
