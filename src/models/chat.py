@@ -47,8 +47,5 @@ class ChatMessage(db.Model):
             'role': role,
             'content': self.content
         }
-        
-        if self.metadata:
-            message['metadata'] = self.metadata
             
         return message
