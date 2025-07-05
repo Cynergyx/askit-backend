@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "c9a2e1d0-1a1b-4b2c-8d3e-9f4a5b6c7d8e",
-		"name": "Cynergyx-Askit API (Complete)",
+		"name": "Cynergyx-Askit API",
 		"description": "Exhaustive API collection for the Cynergyx-Askit backend application. Includes automated variable setting for a smooth workflow.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},

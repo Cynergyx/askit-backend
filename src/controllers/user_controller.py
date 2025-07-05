@@ -7,6 +7,7 @@ from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.extensions import db
 from datetime import datetime
+from sqlalchemy import or_
 import uuid
 
 class UserController:
@@ -23,9 +24,11 @@ class UserController:
         
         if search:
             query = query.filter(
-                (User.email.ilike(f'%{search}%')) |
-                (User.first_name.ilike(f'%{search}%')) |
-                (User.last_name.ilike(f'%{search}%'))
+                or_(
+                    User.email.ilike(f'%{search}%'),
+                    User.first_name.ilike(f'%{search}%'),
+                    User.last_name.ilike(f'%{search}%')
+                )
             )
         
         users = query.paginate(
