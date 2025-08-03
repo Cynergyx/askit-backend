@@ -6,6 +6,7 @@ from src.middleware.rbac_middleware import require_permission
 from src.services.audit_service import AuditService
 from src.services.schema_service import SchemaService
 from src.ai.main import AICompute
+import asyncio
 
 class ChatController:
 
@@ -68,53 +69,35 @@ class ChatController:
         if not user_query:
             return jsonify({'message': 'Query is required'}), 400
 
-        # 1. Save user's message
         user_message = ChatMessage(session_id=session.id, sender='user', content=user_query)
         db.session.add(user_message)
 
-        # 2. Get user's database credentials AND enriched schemas
         db_accesses = g.current_user.database_accesses.all()
         if not db_accesses:
             return jsonify({'message': 'You do not have access to any databases to query.'}), 403
-
-        db_credentials = []
-        enriched_schemas = {}
-        for access in db_accesses:
-            db_credentials.append(access.to_dict())
-            try:
-                enriched_schemas[access.data_source_id] = SchemaService.get_enriched_schema(access.data_source_id)
-            
-            except Exception as e:
-                # If a schema fails to load, we can decide to fail or just log and continue
-                print(f"Warning: Could not load schema for data source {access.data_source_id}: {e}")
-                enriched_schemas[access.data_source_id] = {"error": "Could not load schema"}
-
-
-        # 3. Get chat history for context
-        # We limit history to prevent overly large payloads to the AI
-        chat_history = ChatMessage.query.filter_by(session_id=session.id).order_by(ChatMessage.created_at.desc()).limit(10).all()
-        chat_history.reverse()
         
-        # 4. Pass all info to the AI compute module
+        db_credentials = [access.to_dict() for access in db_accesses]
+        
+        chat_history_models = ChatMessage.query.filter_by(session_id=session.id).order_by(ChatMessage.created_at.desc()).limit(10).all()
+        chat_history_models.reverse()
+        chat_history = [msg.to_dict() for msg in chat_history_models]
+        
         try:
-            ai_response_content, ai_metadata = AICompute.process_query(
+            # Run the async AI orchestrator from our sync Flask route
+            ai_response_content, ai_metadata = asyncio.run(AICompute.process_query(
                 chat_id=session.id,
                 user_query=user_query,
                 db_credentials=db_credentials,
-                enriched_schemas=enriched_schemas,
-                chat_history=[msg.to_dict() for msg in chat_history]
-            )
+                enriched_schemas={}, # Pass enriched schemas if available, for now it's empty
+                chat_history=chat_history
+            ))
         except Exception as e:
-            # Log the error and return a friendly message
             db.session.rollback()
             print(f"AI processing failed: {e}")
-            return jsonify({'message': 'An error occurred while processing your request with the AI agent.'}), 500
+            return jsonify({'message': str(e)}), 500
 
-        # 5. Save AI's response
         ai_message = ChatMessage(session_id=session.id, sender='ai', content=ai_response_content, metadata=ai_metadata)
         db.session.add(ai_message)
-
-        # 6. Commit transaction
         db.session.commit()
 
         AuditService.log_action(
@@ -122,9 +105,7 @@ class ChatController:
             organization_id=g.current_organization.id,
             action='CHAT_MESSAGE_POSTED',
             resource_type='chat_session',
-            resource_id=session.id,
-            details={'query_length': len(user_query)}
+            resource_id=session.id
         )
 
-        # 7. Return AI's response to the user
         return jsonify(ai_message.to_dict()), 200

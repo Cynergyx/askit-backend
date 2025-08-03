@@ -219,3 +219,36 @@ class UserController:
             return jsonify({'message': message}), 400
         
         return jsonify({'message': message}), 200
+    
+
+    @staticmethod
+    @jwt_required_with_org
+    @require_permission('user.update') # Re-using user.update permission for this action
+    def verify_user(user_id):
+        """Verify a user registration."""
+        user = User.query.filter_by(
+            id=user_id,
+            organization_id=g.current_organization.id
+        ).first()
+        
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+        
+        if user.is_verified:
+            return jsonify({'message': 'User is already verified'}), 400
+            
+        user.is_verified = True
+        user.is_active = True # Activating the user upon verification
+        user.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        AuditService.log_action(
+            user_id=g.current_user.id,
+            organization_id=g.current_organization.id,
+            action='USER_VERIFIED',
+            resource_type='user',
+            resource_id=user.id,
+            details={'verified_user_email': user.email}
+        )
+        
+        return jsonify({'message': 'User verified successfully'}), 200

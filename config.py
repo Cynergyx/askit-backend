@@ -24,6 +24,14 @@ class Config:
     SAML_ENTITY_ID = os.environ.get('SAML_ENTITY_ID')
     LDAP_SERVER = os.environ.get('LDAP_SERVER')
     LDAP_BASE_DN = os.environ.get('LDAP_BASE_DN')
+
+    # --- CONSOLIDATED AI/LLM SETTINGS ---
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+    GROQ_API_KEY: str | None = os.getenv("GROQ_API_KEY")
+    OPENAI_API_KEY: str | None = os.getenv("OPENAI_API_KEY")
+    ANTHROPIC_API_KEY: str | None = os.getenv("ANTHROPIC_API_KEY")
+    GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY")
+    DEFAULT_MODEL_PROVIDER: str = os.getenv("DEFAULT_MODEL_PROVIDER", "gemini")
     
     # Security
     BCRYPT_LOG_ROUNDS = 12
@@ -41,3 +49,6 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     ENCRYPTION_KEY = 'CejMECLCNMP2gbV7ugfAxH6zwo_WKqeF5WHx2_FFRZI='
+    # Set dummy keys for testing
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "test-gemini-key")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "test-groq-key")

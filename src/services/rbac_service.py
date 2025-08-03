@@ -28,19 +28,24 @@ class RBACService:
     @staticmethod
     def assign_role(user_id, role_id, granted_by_user_id, expires_at=None):
         user = User.query.get(user_id)
-        role = Role.query.get(role_id)
+        role_to_assign = Role.query.get(role_id)
+        granter = User.query.get(granted_by_user_id)
         
-        if not user or not role:
-            return False, "User or Role not found."
+        if not all([user, role_to_assign, granter]):
+            return False, "User, Role, or Granter not found."
             
-        if role.organization_id != user.organization_id:
+        if role_to_assign.organization_id != user.organization_id:
              return False, "Cannot assign role from a different organization."
 
-        # Check if granter has permission to assign this role
-        if not RBACService.check_permission(granted_by_user_id, 'role.assign'):
-            return False, "Insufficient permissions to assign roles."
+        # --- HIERARCHICAL PERMISSION CHECK ---
+        # An admin cannot grant a role with permissions they do not have themselves.
+        granter_permissions = {p.id for p in granter.get_permissions()}
+        role_permissions = {p.id for p in role_to_assign.permissions}
+        
+        if not role_permissions.issubset(granter_permissions):
+            return False, "Permission denied: You cannot assign a role with permissions you do not possess."
+        # --- END OF CHECK ---
 
-        # Check if user already has an active assignment for this role
         existing_assignment = UserRole.query.filter_by(
             user_id=user_id, 
             role_id=role_id,
@@ -50,7 +55,6 @@ class RBACService:
         if existing_assignment:
             return False, "User already has this active role."
 
-        # Create new assignment
         new_assignment = UserRole(
             user_id=user_id,
             role_id=role_id,
@@ -58,17 +62,16 @@ class RBACService:
             expires_at=datetime.fromisoformat(expires_at) if expires_at else None
         )
         db.session.add(new_assignment)
-        db.session.commit()
-
-        # Log permission change
+        
         AuditService.log_permission_change(
             user_id=granted_by_user_id,
             organization_id=user.organization_id,
             target_user_id=user_id,
             target_role_id=role_id,
             action='GRANT',
-            permission_after={'role': role.name, 'expires_at': expires_at}
+            permission_after={'role': role_to_assign.name, 'expires_at': expires_at}
         )
+        db.session.commit()
         
         return True, "Role assigned successfully."
 
