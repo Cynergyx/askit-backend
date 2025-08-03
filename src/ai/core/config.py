@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str | None = os.getenv("ANTHROPIC_API_KEY", "")
     GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY", "")
 
-    DEFAULT_MODEL_PROVIDER: str = "gemini"
+    DEFAULT_MODEL_PROVIDER: str = os.getenv("DEFAULT_MODEL_PROVIDER", "gemini")
 
     class Config:
         case_sensitive = True
