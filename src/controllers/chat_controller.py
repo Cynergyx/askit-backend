@@ -107,5 +107,5 @@ class ChatController:
             resource_type='chat_session',
             resource_id=session.id
         )
-
-        return jsonify(ai_message.to_dict()), 200
+        response_message = ai_message.to_dict()
+        return jsonify(response_message['content']), 200

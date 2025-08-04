@@ -24,6 +24,9 @@ class AICompute:
         NOTE: Password decryption happens in the `UserDatabaseAccess.to_dict()` method
         before the data is passed to this function.
         """
+
+        # TODO use the enriched schemas
+        # TODO Fix imports
         
         connections: List[DBConnectionParams] = []
         for cred in db_credentials:
@@ -46,15 +49,18 @@ class AICompute:
 
         final_response = await run_orchestrator(request_payload)
         
+        
         if final_response.success:
-            response_content = final_response.analysis
+            response_content = {
+                "analysis": final_response.analysis,
+                "generated_query": final_response.generated_query,
+                "data": final_response.data,
+                "table_desc": final_response.table_desc,
+                "visualization": final_response.visualization
+            }
             metadata = {
                 "response_type": final_response.response_type,
-                "generated_query": final_response.generated_query,
                 "execution_time_ms": final_response.execution_time_ms,
-                "data": final_response.data,
-                "visualization": final_response.visualization,
-                "table_desc": final_response.table_desc
             }
             return response_content, metadata
         else:
