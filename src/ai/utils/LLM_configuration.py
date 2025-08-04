@@ -2,9 +2,9 @@
 import google.generativeai as genai
 from openai import OpenAI
 from anthropic import Anthropic
-from app.core.config import settings
+from ai.core.config import settings
 from dotenv import load_dotenv
-from app.utils.exceptions import LLMNotConfiguredError
+from ai.utils.exceptions import LLMNotConfiguredError
 import logging
 import re, json
 

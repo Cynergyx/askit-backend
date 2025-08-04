@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.database import Database as MongoDatabase
 
-from app.models.db import DBConnectionParams
-from app.utils.exceptions import ConnectionError
+from ai.models.db import DBConnectionParams
+from ai.utils.exceptions import ConnectionError
 
 logger = logging.getLogger(__name__)
 

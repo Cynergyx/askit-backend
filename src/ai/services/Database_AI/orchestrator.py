@@ -4,19 +4,19 @@ import json
 import time
 from typing import TypedDict, Annotated, List, Dict, Any, Literal
 
-from app.models.query import NLQueryRequest, FinalResponse
-from app.services.Database_AI.db_inspector import DatabaseInspector
-from app.services.Database_AI.query_generator import QueryGenerator
-from app.services.Database_AI.query_executor import SafeQueryExecutor
-from app.services.Database_AI.summary_generator import SummaryGenerator
-from app.services.Database_AI.insight_generator import InsightGenerator
-from app.services.Database_AI.data_joiner import DataJoiner
-from app.services.Database_AI.classify_user_intent import classify_user_intent
-from app.services.Database_AI.general_answer import generate_general_llm_response
-from app.utils.exceptions import ConnectionError, SchemaError, IntentClassificationError, GeneralAnswerError, QueryGenerationError, QueryExecutionError, JoinError, AnalysisError, LLMNotConfiguredError
-from app.utils.LLM_configuration import LLMConfig
-from app.db.db_connector import get_db_connection
-from app.core.config import settings
+from ai.models.query import NLQueryRequest, FinalResponse
+from ai.services.Database_AI.db_inspector import DatabaseInspector
+from ai.services.Database_AI.query_generator import QueryGenerator
+from ai.services.Database_AI.query_executor import SafeQueryExecutor
+from ai.services.Database_AI.summary_generator import SummaryGenerator
+from ai.services.Database_AI.insight_generator import InsightGenerator
+from ai.services.Database_AI.data_joiner import DataJoiner
+from ai.services.Database_AI.classify_user_intent import classify_user_intent
+from ai.services.Database_AI.general_answer import generate_general_llm_response
+from ai.utils.exceptions import ConnectionError, SchemaError, IntentClassificationError, GeneralAnswerError, QueryGenerationError, QueryExecutionError, JoinError, AnalysisError, LLMNotConfiguredError
+from ai.utils.LLM_configuration import LLMConfig
+from ai.db.db_connector import get_db_connection
+from ai.core.config import settings
 
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages

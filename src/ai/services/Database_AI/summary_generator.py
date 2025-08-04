@@ -3,9 +3,9 @@ import json
 from typing import List, Dict, Any
 
 # Local application imports
-from app.prompts.query_prompt import get_query_prompt
-from app.utils.LLM_configuration import LLMConfig
-from app.utils.exceptions import LLMNotConfiguredError
+from ai.prompts.query_prompt import get_query_prompt
+from ai.utils.LLM_configuration import LLMConfig
+from ai.utils.exceptions import LLMNotConfiguredError
 
 
 

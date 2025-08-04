@@ -1,8 +1,8 @@
 import logging
 import json
-from app.prompts.plan_generation_prompt import get_multi_db_query_plan_prompt
-from app.utils.LLM_configuration import LLMConfig
-from app.utils.exceptions import LLMNotConfiguredError
+from ai.prompts.plan_generation_prompt import get_multi_db_query_plan_prompt
+from ai.utils.LLM_configuration import LLMConfig
+from ai.utils.exceptions import LLMNotConfiguredError
 
 logger = logging.getLogger(__name__)
 

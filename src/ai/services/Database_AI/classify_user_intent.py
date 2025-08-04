@@ -2,9 +2,9 @@ import json
 import logging
 import re
 
-from app.prompts.classify_user_intent_prompt import get_classify_user_intent_prompt
-from app.utils.LLM_configuration import LLMConfig
-from app.utils.exceptions import LLMNotConfiguredError
+from ai.prompts.classify_user_intent_prompt import get_classify_user_intent_prompt
+from ai.utils.LLM_configuration import LLMConfig
+from ai.utils.exceptions import LLMNotConfiguredError
 
 
 logger = logging.getLogger(__name__)

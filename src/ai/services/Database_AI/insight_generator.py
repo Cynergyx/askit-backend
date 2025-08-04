@@ -3,9 +3,9 @@ import json
 from typing import List, Dict, Any
 
 # Local application imports
-from app.prompts.analysis_prompt import get_analysis_prompt
-from app.utils.LLM_configuration import LLMConfig
-from app.utils.exceptions import LLMNotConfiguredError
+from ai.prompts.analysis_prompt import get_analysis_prompt
+from ai.utils.LLM_configuration import LLMConfig
+from ai.utils.exceptions import LLMNotConfiguredError
 
 
 logger = logging.getLogger(__name__)
