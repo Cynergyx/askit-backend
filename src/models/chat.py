@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class ChatSession(db.Model):
@@ -30,9 +30,9 @@ class ChatMessage(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     session_id = db.Column(db.String(36), db.ForeignKey('chat_sessions.id'), nullable=False)
     sender = db.Column(db.Enum('user', 'ai', name='chat_sender_type'), nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    content = db.Column(db.JSON, nullable=False)
     metadata = db.Column(db.JSON, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     session = db.relationship('ChatSession', back_populates='messages')
 

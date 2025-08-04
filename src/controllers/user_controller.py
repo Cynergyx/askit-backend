@@ -223,7 +223,7 @@ class UserController:
 
     @staticmethod
     @jwt_required_with_org
-    @require_permission('user.update') # Re-using user.update permission for this action
+    @require_permission('user.update')
     def verify_user(user_id):
         """Verify a user registration."""
         user = User.query.filter_by(
@@ -238,7 +238,7 @@ class UserController:
             return jsonify({'message': 'User is already verified'}), 400
             
         user.is_verified = True
-        user.is_active = True # Activating the user upon verification
+        user.is_active = True
         user.updated_at = datetime.utcnow()
         db.session.commit()
         
