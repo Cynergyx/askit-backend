@@ -1,4 +1,3 @@
-import asyncio
 from typing import List
 
 from models.query import NLQueryRequest
@@ -26,7 +25,6 @@ class AICompute:
         """
 
         # TODO use the enriched schemas
-        # TODO Fix imports
         
         connections: List[DBConnectionParams] = []
         for cred in db_credentials:
