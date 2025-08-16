@@ -73,8 +73,8 @@ class ChatController:
         db.session.add(user_message)
 
         db_accesses = g.current_user.database_accesses.all()
-        # if not db_accesses:
-        #     return jsonify({'message': 'You do not have access to any databases to query.'}), 403
+        if not db_accesses:
+            return jsonify({'message': 'You do not have access to any databases to query.'}), 403
         
         db_credentials = [access.to_dict() for access in db_accesses]
         
