@@ -3,7 +3,7 @@ import google.generativeai as genai
 from openai import OpenAI
 from anthropic import Anthropic
 from config import Config
-from utils.exceptions import LLMNotConfiguredError
+from src.utils.exceptions import LLMNotConfiguredError
 import logging
 import re, json
 

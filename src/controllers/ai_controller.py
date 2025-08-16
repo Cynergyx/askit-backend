@@ -1,9 +1,9 @@
 from typing import List
 
-from models.query import NLQueryRequest
-from models.db import DBConnectionParams
+from src.models.query import NLQueryRequest
+from src.models.db import DBConnectionParams
 
-from services.orchestrator_service import process_natural_language_query as run_orchestrator
+from src.services.orchestrator_service import process_natural_language_query as run_orchestrator
 
 from pydantic import SecretStr
 

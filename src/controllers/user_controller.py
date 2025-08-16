@@ -6,7 +6,7 @@ from src.services.audit_service import AuditService
 from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import or_
 import uuid
 
@@ -127,7 +127,7 @@ class UserController:
             if field in data:
                 setattr(user, field, data[field])
         
-        user.updated_at = datetime.utcnow()
+        user.updated_at = datetime.now(timezone.utc)
         db.session.commit()
         
         # Log user update
@@ -162,7 +162,7 @@ class UserController:
             return jsonify({'message': 'Cannot delete yourself'}), 400
         
         user.is_active = False
-        user.updated_at = datetime.utcnow()
+        user.updated_at = datetime.now(timezone.utc)
         db.session.commit()
         
         # Log user deletion
@@ -239,7 +239,7 @@ class UserController:
             
         user.is_verified = True
         user.is_active = True
-        user.updated_at = datetime.utcnow()
+        user.updated_at = datetime.now(timezone.utc)
         db.session.commit()
         
         AuditService.log_action(

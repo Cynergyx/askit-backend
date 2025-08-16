@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class Role(db.Model):
@@ -12,7 +12,7 @@ class Role(db.Model):
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'))
     is_system_role = db.Column(db.Boolean, default=False, nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     parent_role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=True)
     level = db.Column(db.Integer, nullable=True)
     

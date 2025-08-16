@@ -45,7 +45,7 @@ class PermissionChangeLog(db.Model):
     permission_before = db.Column(db.JSON)
     permission_after = db.Column(db.JSON)
     reason = db.Column(db.Text)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     # Relationships
     # FIX: Explicitly define foreign keys for each relationship to User

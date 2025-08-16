@@ -5,7 +5,7 @@ from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.services.audit_service import AuditService
 from src.services.schema_service import SchemaService
-from controllers.ai_controller import AICompute
+from src.controllers.ai_controller import AICompute
 import asyncio
 
 class ChatController:
@@ -73,8 +73,8 @@ class ChatController:
         db.session.add(user_message)
 
         db_accesses = g.current_user.database_accesses.all()
-        if not db_accesses:
-            return jsonify({'message': 'You do not have access to any databases to query.'}), 403
+        # if not db_accesses:
+        #     return jsonify({'message': 'You do not have access to any databases to query.'}), 403
         
         db_credentials = [access.to_dict() for access in db_accesses]
         
@@ -96,7 +96,7 @@ class ChatController:
             print(f"AI processing failed: {e}")
             return jsonify({'message': str(e)}), 500
 
-        ai_message = ChatMessage(session_id=session.id, sender='ai', content=ai_response_content, metadata=ai_metadata)
+        ai_message = ChatMessage(session_id=session.id, sender='ai', content=ai_response_content, ai_metadata=ai_metadata)
         db.session.add(ai_message)
         db.session.commit()
 

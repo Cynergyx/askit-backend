@@ -1,6 +1,6 @@
 from src.extensions import db
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class UserRole(db.Model):
@@ -9,7 +9,7 @@ class UserRole(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False, index=True)
     role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False, index=True)
     granted_by_user_id = db.Column(db.String(36), db.ForeignKey('users.id'))
-    granted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    granted_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     expires_at = db.Column(db.DateTime, nullable=True)
     is_active = db.Column(db.Boolean, default=True, index=True)
 
@@ -31,8 +31,8 @@ class User(db.Model):
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
     is_sso_user = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
     last_login = db.Column(db.DateTime)
     
     organization = db.relationship('Organization', backref='users')
@@ -50,7 +50,7 @@ class User(db.Model):
         """Returns a list of active Role objects."""
         active_roles = []
         for assignment in self.role_assignments:
-            if assignment.is_active and (assignment.expires_at is None or assignment.expires_at > datetime.utcnow()):
+            if assignment.is_active and (assignment.expires_at is None or assignment.expires_at > datetime.now(timezone.utc)()):
                 if assignment.role:
                     active_roles.append(assignment.role)
         return active_roles

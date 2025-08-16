@@ -7,7 +7,7 @@ from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.services.audit_service import AuditService
 from src.services.rbac_service import RBACService
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class RoleRequestController:
@@ -74,7 +74,7 @@ class RoleRequestController:
 
         req.status = 'APPROVED'
         req.reviewed_by_id = g.current_user.id
-        req.reviewed_at = datetime.utcnow()
+        req.reviewed_at = datetime.now(timezone.utc)
         req.reviewer_notes = request.json.get('notes')
         db.session.commit()
         
@@ -91,7 +91,7 @@ class RoleRequestController:
 
         req.status = 'DENIED'
         req.reviewed_by_id = g.current_user.id
-        req.reviewed_at = datetime.utcnow()
+        req.reviewed_at = datetime.now(timezone.utc)
         req.reviewer_notes = request.json.get('notes', 'No reason provided.')
         db.session.commit()
         

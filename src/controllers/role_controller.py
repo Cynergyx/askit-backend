@@ -5,7 +5,7 @@ from src.services.audit_service import AuditService
 from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class RoleController:
@@ -121,7 +121,7 @@ class RoleController:
             if field in data:
                 setattr(role, field, data[field])
         
-        role.updated_at = datetime.utcnow()
+        role.updated_at = datetime.now(timezone.utc)
         db.session.commit()
         
         # Log role update
@@ -163,7 +163,7 @@ class RoleController:
             return jsonify({'message': 'Cannot delete role with active user assignments'}), 400
         
         role.is_active = False
-        role.updated_at = datetime.utcnow()
+        role.updated_at = datetime.now(timezone.utc)
         db.session.commit()
         
         # Log role deletion

@@ -1,5 +1,5 @@
 from src.extensions import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 class RoleRequest(db.Model):
@@ -13,7 +13,7 @@ class RoleRequest(db.Model):
     reason = db.Column(db.Text)
     status = db.Column(db.String(50), default='PENDING', nullable=False) # PENDING, APPROVED, DENIED
     
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     reviewed_at = db.Column(db.DateTime)
     reviewed_by_id = db.Column(db.String(36), db.ForeignKey('users.id'))
     reviewer_notes = db.Column(db.Text)

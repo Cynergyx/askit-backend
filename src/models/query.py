@@ -3,8 +3,8 @@ from typing import List, Dict, Any, Optional, Literal
 from bson.decimal128 import Decimal128
 
 # Import the DBConnectionParams from its new location
-from models.db import DBConnectionParams
-from models.chat_history import ChatHistory
+from src.models.db import DBConnectionParams
+from src.models.chat_history import ChatHistory
 
 
 # Accepts user question and now includes the connections

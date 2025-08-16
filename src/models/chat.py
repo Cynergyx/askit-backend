@@ -9,7 +9,7 @@ class ChatSession(db.Model):
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     organization_id = db.Column(db.String(36), db.ForeignKey('organizations.id'), nullable=False)
     title = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     user = db.relationship('User', back_populates='chat_sessions')
     organization = db.relationship('Organization')
@@ -31,7 +31,7 @@ class ChatMessage(db.Model):
     session_id = db.Column(db.String(36), db.ForeignKey('chat_sessions.id'), nullable=False)
     sender = db.Column(db.Enum('user', 'ai', name='chat_sender_type'), nullable=False)
     content = db.Column(db.JSON, nullable=False)
-    metadata = db.Column(db.JSON, nullable=False)
+    ai_metadata = db.Column(db.JSON, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     session = db.relationship('ChatSession', back_populates='messages')

@@ -7,7 +7,7 @@ from pymongo.database import Database as MongoDatabase
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
-from utils.exceptions import SecurityError, QueryExecutionError
+from src.utils.exceptions import SecurityError, QueryExecutionError
 import logging
 
 logger = logging.getLogger(__name__)

@@ -1,10 +1,10 @@
+from src.prompts.classify_user_intent_prompt import get_classify_user_intent_prompt
+from src.utils.llm_configuration import LLMConfig
+from src.utils.exceptions import LLMNotConfiguredError
+
 import json
 import logging
 import re
-
-from prompts.classify_user_intent_prompt import get_classify_user_intent_prompt
-from utils.llm_configuration import LLMConfig
-from utils.exceptions import LLMNotConfiguredError
 
 
 logger = logging.getLogger(__name__)
