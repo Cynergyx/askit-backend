@@ -4,19 +4,18 @@ import json
 import time
 from typing import TypedDict, Annotated, List, Dict, Any, Literal
 
-from ai.models.query import NLQueryRequest, FinalResponse
-from ai.services.Database_AI.db_inspector import DatabaseInspector
-from ai.services.Database_AI.query_generator import QueryGenerator
-from ai.services.Database_AI.query_executor import SafeQueryExecutor
-from ai.services.Database_AI.summary_generator import SummaryGenerator
-from ai.services.Database_AI.insight_generator import InsightGenerator
-from ai.services.Database_AI.data_joiner import DataJoiner
-from ai.services.Database_AI.classify_user_intent import classify_user_intent
-from ai.services.Database_AI.general_answer import generate_general_llm_response
-from ai.utils.exceptions import ConnectionError, SchemaError, IntentClassificationError, GeneralAnswerError, QueryGenerationError, QueryExecutionError, JoinError, AnalysisError, LLMNotConfiguredError
-from ai.utils.LLM_configuration import LLMConfig
-from ai.db.db_connector import get_db_connection
-from ai.core.config import settings
+from models.query import NLQueryRequest, FinalResponse
+from services.db_inspector_service import DatabaseInspector
+from services.query_generator_service import QueryGenerator
+from services.query_executor_service import SafeQueryExecutor
+from services.summary_generator_service import SummaryGenerator
+from services.insight_generator_service import InsightGenerator
+from services.data_joiner_service import DataJoiner
+from services.classify_user_intent_service import classify_user_intent
+from services.general_answer_service import generate_general_llm_response
+from utils.exceptions import ConnectionError, SchemaError, IntentClassificationError, GeneralAnswerError, QueryGenerationError, QueryExecutionError, JoinError, AnalysisError, LLMNotConfiguredError
+from utils.llm_configuration import LLMConfig
+from utils.db_connector import get_db_connection
 
 from langgraph.graph import StateGraph, END
 from langgraph.graph.message import add_messages

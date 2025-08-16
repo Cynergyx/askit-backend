@@ -1,10 +1,10 @@
 import asyncio
 from typing import List
 
-from ai.models.query import NLQueryRequest
-from ai.models.db import DBConnectionParams
+from models.query import NLQueryRequest
+from models.db import DBConnectionParams
 
-from ai.services.Database_AI.orchestrator import process_natural_language_query as run_orchestrator
+from services.orchestrator_service import process_natural_language_query as run_orchestrator
 
 from pydantic import SecretStr
 

@@ -1,7 +1,7 @@
-from ai.utils.exceptions import LLMNotConfiguredError
+from utils.exceptions import LLMNotConfiguredError
 from typing import List, Dict, Any
-from ai.prompts.general_answer_prompt import get_general_answer_prompt
-from ai.utils.LLM_configuration import LLMConfig
+from prompts.general_answer_prompt import get_general_answer_prompt
+from utils.llm_configuration import LLMConfig
 import logging
 
 logger = logging.getLogger(__name__)

@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional, Literal
 from bson.decimal128 import Decimal128
 
 # Import the DBConnectionParams from its new location
-from src.ai.models.db import DBConnectionParams
+from models.db import DBConnectionParams
 
 # Accepts user question and now includes the connections
 class NLQueryRequest(BaseModel):

@@ -2,9 +2,9 @@
 import google.generativeai as genai
 from openai import OpenAI
 from anthropic import Anthropic
-from ai.core.config import settings
+from config import Config
 from dotenv import load_dotenv
-from ai.utils.exceptions import LLMNotConfiguredError
+from utils.exceptions import LLMNotConfiguredError
 import logging
 import re, json
 
@@ -27,7 +27,7 @@ class LLMConfig:
         # Initialize the appropriate client and model
         self._client = None
         if self.model_provider == 'gemini':
-            api_key = settings.GEMINI_API_KEY
+            api_key = Config.GEMINI_API_KEY
             if not api_key:
                 raise LLMNotConfiguredError("GOOGLE_API_KEY environment variable not set.")
             genai.configure(api_key=api_key)
@@ -37,21 +37,21 @@ class LLMConfig:
             self._chat_session = self._client.start_chat(history=self._prepare_gemini_history())
 
         elif self.model_provider == 'claude':
-            api_key = settings.ANTHROPIC_API_KEY
+            api_key = Config.ANTHROPIC_API_KEY
             if not api_key:
                 raise LLMNotConfiguredError("ANTHROPIC_API_KEY environment variable not set.")
             self.model_name = model_name or 'claude-3-haiku-20240307' # A fast, cheap default
             self._client = Anthropic(api_key=api_key)
 
         elif self.model_provider == 'openai':
-            api_key = settings.OPENAI_API_KEY
+            api_key = Config.OPENAI_API_KEY
             if not api_key:
                 raise LLMNotConfiguredError("OPENAI_API_KEY environment variable not set.")
             self.model_name = model_name or 'gpt-4o' # A great default
             self._client = OpenAI(api_key=api_key)
         
         else:
-            api_key = settings.GEMINI_API_KEY
+            api_key = Config.GEMINI_API_KEY
             if not api_key:
                 raise ValueError("GOOGLE_API_KEY environment variable not set.")
             genai.configure(api_key=api_key)

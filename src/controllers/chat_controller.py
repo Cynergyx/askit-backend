@@ -5,7 +5,7 @@ from src.middleware.auth_middleware import jwt_required_with_org
 from src.middleware.rbac_middleware import require_permission
 from src.services.audit_service import AuditService
 from src.services.schema_service import SchemaService
-from src.ai.main import AICompute
+from controllers.ai_controller import AICompute
 import asyncio
 
 class ChatController:
