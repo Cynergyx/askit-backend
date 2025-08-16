@@ -1,0 +1,379 @@
+{
+    "version": "1.0",
+    "flow": {
+        "id": "1",
+        "name": "Backend Flow",
+        "nodes": [
+            {
+                "id": "2",
+                "type": "start",
+                "data": {},
+                "position": {
+                    "x": 50,
+                    "y": 50
+                }
+            },
+            {
+                "id": "3",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/auth/login",
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"email\": \"super@admin.com\",\n    \"password\": \"password\",\n    \"organization\": \"superorg\"\n}"
+                    },
+                    "events": {
+                        "test": "pm.collectionVariables.set(\"jwt_super_admin\", pm.response.json().access_token);"
+                    },
+                    "name": "Login Super Admin"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 200
+                }
+            },
+            {
+                "id": "4",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/organizations/onboard",
+                    "auth": {
+                        "type": "bearer",
+                        "bearer": {
+                            "token": "{{jwt_super_admin}}"
+                        }
+                    },
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"organization\": {\n        \"name\": \"Flow Test Corp\",\n        \"domain\": \"flowtest.com\"\n    },\n    \"users\": [\n        {\n            \"email\": \"admin@flowtest.com\",\n            \"password\": \"StrongPassword123!\",\n            \"first_name\": \"Flow\",\n            \"last_name\": \"Admin\",\n            \"is_admin\": true\n        },\n        {\n            \"email\": \"member@flowtest.com\",\n            \"password\": \"AnotherPassword456!\",\n            \"first_name\": \"Flow\",\n            \"last_name\": \"Member\",\n            \"is_admin\": false\n        }\n    ]\n}"
+                    },
+                    "events": {
+                        "test": "let jsonData = pm.response.json();\npm.collectionVariables.set(\"member_user_id\", jsonData.users.find(u => u.email === 'member@flowtest.com').id);"
+                    },
+                    "name": "Onboard Organization"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 400
+                }
+            },
+            {
+                "id": "5",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/auth/login",
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"email\": \"admin@flowtest.com\",\n    \"password\": \"StrongPassword123!\",\n    \"organization\": \"flowtest.com\"\n}"
+                    },
+                    "events": {
+                        "test": "pm.collectionVariables.set(\"jwt_org_admin\", pm.response.json().access_token);"
+                    },
+                    "name": "Login Org Admin"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 600
+                }
+            },
+            {
+                "id": "6",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/datasources/bulk-upload",
+                    "auth": {
+                        "type": "bearer",
+                        "bearer": {
+                            "token": "{{jwt_org_admin}}"
+                        }
+                    },
+                    "body": {
+                        "mode": "raw",
+                        "raw": "[\n    {\n        \"name\": \"Test Postgres DB\",\n        \"type\": \"postgresql\",\n        \"host\": \"localhost\",\n        \"port\": 5432,\n        \"database_name\": \"rbac_db\",\n        \"username\": \"user\",\n        \"password\": \"password\"\n    }\n]"
+                    },
+                    "events": {
+                        "test": "pm.collectionVariables.set(\"data_source_id\", pm.response.json().onboarded_ids[0]);"
+                    },
+                    "name": "Upload Data Source"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 800
+                }
+            },
+            {
+                "id": "7",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
+                    "auth": {
+                        "type": "bearer",
+                        "bearer": {
+                            "token": "{{jwt_org_admin}}"
+                        }
+                    },
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"data_source_id\": \"{{data_source_id}}\"\n}"
+                    },
+                    "name": "Grant DB Access to Member"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 1000
+                }
+            },
+            {
+                "id": "8",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/auth/login",
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"email\": \"member@flowtest.com\",\n    \"password\": \"AnotherPassword456!\",\n    \"organization\": \"flowtest.com\"\n}"
+                    },
+                    "events": {
+                        "test": "pm.collectionVariables.set(\"jwt_user\", pm.response.json().access_token);"
+                    },
+                    "name": "Login as Member"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 1200
+                }
+            },
+            {
+                "id": "9",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/chat/sessions",
+                    "auth": {
+                        "type": "bearer",
+                        "bearer": {
+                            "token": "{{jwt_user}}"
+                        }
+                    },
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"title\": \"AI Test via Flow\"\n}"
+                    },
+                    "events": {
+                        "test": "pm.collectionVariables.set(\"session_id\", pm.response.json().id);"
+                    },
+                    "name": "Create Chat Session"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 1400
+                }
+            },
+            {
+                "id": "10",
+                "type": "request",
+                "data": {
+                    "method": "POST",
+                    "url": "{{baseUrl}}/api/chat/sessions/{{session_id}}/messages",
+                    "auth": {
+                        "type": "bearer",
+                        "bearer": {
+                            "token": "{{jwt_user}}"
+                        }
+                    },
+                    "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"query\": \"Show me the last 5 users who created an account.\"\n}"
+                    },
+                    "name": "Post Message to AI"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 1600
+                }
+            },
+            {
+                "id": "11",
+                "type": "condition",
+                "data": {
+                    "condition": "{{response.code}} == 200",
+                    "name": "AI Responded OK?"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 1800
+                }
+            },
+            {
+                "id": "12",
+                "type": "output",
+                "data": {
+                    "message": "SUCCESS: AI query completed successfully.",
+                    "name": "Log Success"
+                },
+                "position": {
+                    "x": 50,
+                    "y": 2000
+                }
+            },
+            {
+                "id": "13",
+                "type": "output",
+                "data": {
+                    "message": "FAILURE: AI query failed. Status: {{response.code}} Body: {{response.body}}",
+                    "name": "Log Failure"
+                },
+                "position": {
+                    "x": 250,
+                    "y": 2000
+                }
+            },
+            {
+                "id": "14",
+                "type": "end",
+                "data": {},
+                "position": {
+                    "x": 150,
+                    "y": 2200
+                }
+            }
+        ],
+        "connections": [
+            {
+                "source": {
+                    "id": "2",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "3",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "3",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "4",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "4",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "5",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "5",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "6",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "6",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "7",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "7",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "8",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "8",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "9",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "9",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "10",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "10",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "11",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "11",
+                    "port": "then"
+                },
+                "target": {
+                    "id": "12",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "11",
+                    "port": "else"
+                },
+                "target": {
+                    "id": "13",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "12",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "14",
+                    "port": "in"
+                }
+            },
+            {
+                "source": {
+                    "id": "13",
+                    "port": "out"
+                },
+                "target": {
+                    "id": "14",
+                    "port": "in"
+                }
+            }
+        ]
+    }
+}
