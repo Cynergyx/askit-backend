@@ -6,7 +6,7 @@ from src.services.auth_service import AuthService
 from src.services.audit_service import AuditService
 from src.extensions import db
 import requests
-import ldap
+import ldap3 as ldap
 import uuid
 from datetime import datetime
 
