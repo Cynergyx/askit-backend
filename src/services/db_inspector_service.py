@@ -3,6 +3,8 @@ from typing import Union, Set, Dict, Any
 from sqlalchemy import inspect, text
 from sqlalchemy.ext.asyncio import AsyncEngine
 from pymongo.database import Database as MongoDatabase
+import uuid
+from decimal import Decimal
 
 
 logger = logging.getLogger(__name__)
@@ -11,13 +13,26 @@ class DatabaseInspector:
     def __init__(self, db_connection: Union[AsyncEngine, MongoDatabase], db_type: str):
         self.db_connection = db_connection
         self.db_type = db_type
+    
+
+    def make_json_serializable(self, obj):
+        if isinstance(obj, dict):
+            return {k: self.make_json_serializable(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [self.make_json_serializable(v) for v in obj]
+        elif isinstance(obj, uuid.UUID):
+            return str(obj)
+        elif isinstance(obj, Decimal):
+            return float(obj)  # or str(obj) if you prefer
+        else:
+            return obj
 
     async def get_schema_representation(self) -> dict:
         try:
             if self.db_type in ['postgresql', 'mysql']:
-                return await self._get_sql_schema()
+                return self.make_json_serializable(await self._get_sql_schema())
             elif self.db_type == 'mongodb':
-                return await self._get_mongo_schema()
+                return self.make_json_serializable(await self._get_mongo_schema())
             else:
                 logger.error(f"Unsupported database type for inspection: {self.db_type}")
                 raise ValueError(f"Unsupported database type for inspection: {self.db_type}")
