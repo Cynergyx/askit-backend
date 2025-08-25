@@ -1,4 +1,5 @@
 from flask import request, jsonify, g, current_app
+from sqlalchemy import or_
 from src.models.organization import Organization
 from src.models.data_source import DataSource
 from src.extensions import db
@@ -15,8 +16,23 @@ class DataSourceController:
     @jwt_required_with_org
     @require_permission('datasource.read')
     def list_data_sources():
-        """List all available data sources for the current organization."""
-        data_sources = DataSource.query.filter_by(organization_id=g.current_organization.id).all()
+        """
+        List all available data sources for the current organization.
+        Accepts an optional `search` query parameter to filter by name or type.
+        """
+        search_term = request.args.get('search', None)
+        
+        query = DataSource.query.filter_by(organization_id=g.current_organization.id)
+
+        if search_term:
+            query = query.filter(
+                or_(
+                    DataSource.name.ilike(f'%{search_term}%'),
+                    DataSource.type.ilike(f'%{search_term}%')
+                )
+            )
+
+        data_sources = query.all()
         return jsonify([ds.to_dict() for ds in data_sources]), 200
 
     @staticmethod

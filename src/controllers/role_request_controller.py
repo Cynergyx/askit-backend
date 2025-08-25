@@ -19,13 +19,17 @@ class RoleRequestController:
         if not data or 'role_id' not in data:
             return jsonify({'message': 'role_id is required'}), 400
         
-        role = Role.query.filter_by(id=data['role_id'], organization_id=g.current_organization.id).first()
+        role_id_to_request = data['role_id']
+        
+        # Check if the role exists and belongs to the organization
+        role = Role.query.filter_by(id=role_id_to_request, organization_id=g.current_organization.id).first()
         if not role:
-            return jsonify({'message': 'Role not found'}), 404
+            return jsonify({'message': 'Role not found within your organization'}), 404
         
         # Prevent requesting a role the user already has
-        if role in g.current_user.get_roles():
-            return jsonify({'message': 'You already have this role'}), 409
+        current_user_role_ids = {r.id for r in g.current_user.get_roles()}
+        if role_id_to_request in current_user_role_ids:
+            return jsonify({'message': f"You already have the '{role.name}' role."}), 409
         
         # Prevent duplicate pending requests
         pending_request = RoleRequest.query.filter_by(

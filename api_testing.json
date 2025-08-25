@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "c9a2e1d0-1a1b-4b2c-8d3e-9f4a5b6c7d8e",
-		"name": "Askit APIs",
-		"description": "Exhaustive API collection for the Cynergyx-Askit backend application. Includes automated variable setting for a smooth workflow.",
+		"_postman_id": "a1b2c3d4-e5f6-4a9b-8c7d-6e5f4a3b2c1d",
+		"name": "Askit API",
+		"description": "Exhaustive API collection for the Cynergyx-Askit backend application. Includes automated variable setting for a smooth workflow and all new endpoints.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -55,7 +55,7 @@
 					"response": []
 				},
 				{
-					"name": "Login Org Admin/User",
+					"name": "Login Org Admin",
 					"event": [
 						{
 							"listen": "test",
@@ -63,10 +63,8 @@
 								"exec": [
 									"if (pm.response.code === 200) {",
 									"    var jsonData = pm.response.json();",
-									"    pm.collectionVariables.set(\"jwt_user\", jsonData.access_token);",
-									"    pm.collectionVariables.set(\"user_id\", jsonData.user.id);",
-									"    pm.collectionVariables.set(\"org_id\", jsonData.user.organization_id);",
-									"    console.log(\"Set User JWT, User ID, and Org ID from login.\");",
+									"    pm.collectionVariables.set(\"jwt_org_admin\", jsonData.access_token);",
+									"    console.log(\"Set Org Admin JWT.\");",
 									"}"
 								],
 								"type": "text/javascript"
@@ -96,18 +94,35 @@
 								"login"
 							]
 						},
-						"description": "Login as a regular organization user or admin. This sets the `jwt_user` and other related variables."
+						"description": "Login as the organization admin to perform admin-level tasks. Sets `jwt_org_admin`."
 					},
 					"response": []
 				},
 				{
-					"name": "Register New User",
+					"name": "Login Org Member",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"jwt_user\", jsonData.access_token);",
+									"    pm.collectionVariables.set(\"user_id\", jsonData.user.id);",
+									"    pm.collectionVariables.set(\"org_id\", jsonData.user.organization_id);",
+									"    console.log(\"Set Org Member JWT, User ID, and Org ID.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"new.user@innovatecorp.com\",\n    \"password\": \"VeryStrongPassword123!\",\n    \"first_name\": \"New\",\n    \"last_name\": \"User\",\n    \"organization\": \"innovatecorp.com\"\n}",
+							"raw": "{\n    \"email\": \"analyst@innovatecorp.com\",\n    \"password\": \"AnotherPassword456!\",\n    \"organization\": \"innovatecorp.com\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -115,74 +130,17 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/auth/register",
+							"raw": "{{baseUrl}}/api/auth/login",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"auth",
-								"register"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Refresh Token",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_user}}",
-									"type": "string"
-								}
+								"login"
 							]
 						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/auth/refresh",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"refresh"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Logout",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_user}}",
-									"type": "string"
-								}
-							]
-						},
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/auth/logout",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"logout"
-							]
-						}
+						"description": "Login as a regular organization member. This sets the `jwt_user` and other related variables."
 					},
 					"response": []
 				}
@@ -247,470 +205,34 @@
 						"description": "Requires Super Admin JWT. Onboards a new company."
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"description": "CRUD operations for users.",
-			"item": [
+				},
 				{
-					"name": "Get All Users",
+					"name": "Delete Organization (Soft)",
 					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/users?search=admin",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users"
-							],
-							"query": [
+						"auth": {
+							"type": "bearer",
+							"bearer": [
 								{
-									"key": "search",
-									"value": "admin"
+									"key": "token",
+									"value": "{{jwt_super_admin}}",
+									"type": "string"
 								}
 							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create User",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"new.hire@innovatecorp.com\",\n    \"first_name\": \"New\",\n    \"last_name\": \"Hire\",\n    \"password\": \"DefaultPassword123!\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{member_user_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update User",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"first_name\": \"Data\",\n    \"last_name\": \"Analyst\",\n    \"is_active\": true\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{member_user_id}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete User (Soft)",
-					"request": {
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"raw": "{{baseUrl}}/api/organizations/{{onboarded_org_id}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"users",
-								"{{member_user_id}}"
+								"organizations",
+								"{{onboarded_org_id}}"
 							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Roles & Permissions",
-			"description": "Managing roles and their associated permissions.",
-			"item": [
-				{
-					"name": "Get All Roles",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var jsonData = pm.response.json();",
-									"    var pmRole = jsonData.roles.find(r => r.name === 'Project Manager');",
-									"    if (pmRole) {",
-									"        pm.collectionVariables.set(\"role_id_pm\", pmRole.id);",
-									"        console.log(\"Set role_id_pm from response.\");",
-									"    }",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/roles",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Create Role",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Finance Viewer\",\n    \"display_name\": \"Finance Viewer\",\n    \"description\": \"Can view financial reports.\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/roles",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Role by ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles",
-								"{{role_id_pm}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Role",
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"description\": \"Manages projects, users, and their associated tasks.\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles",
-								"{{role_id_pm}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Delete Role",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles",
-								"{{role_id_pm}}"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Assign Role to User",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{member_user_id}}",
-								"roles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Revoke Role from User",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{member_user_id}}",
-								"roles"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get All Permissions",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/roles/permissions",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"roles",
-								"permissions"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Role Requests",
-			"description": "Workflow for users to request additional roles.",
-			"item": [
-				{
-					"name": "User Requests a Role",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    var jsonData = pm.response.json();",
-									"    pm.collectionVariables.set(\"role_request_id\", jsonData.id);",
-									"    console.log(\"Set role_request_id from response.\");",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\",\n    \"reason\": \"I need to manage the Q4 project tasks.\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/role-requests/",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"role-requests",
-								""
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Admin Lists Pending Requests",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/role-requests?status=PENDING",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"role-requests"
-							],
-							"query": [
-								{
-									"key": "status",
-									"value": "PENDING"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Admin Approves Request",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"notes\": \"Approved for Q4 project.\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/role-requests/{{role_request_id}}/approve",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"role-requests",
-								"{{role_request_id}}",
-								"approve"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Admin Denies Request",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"notes\": \"This role is not required for your current duties.\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/role-requests/{{role_request_id}}/deny",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"role-requests",
-								"{{role_request_id}}",
-								"deny"
-							]
-						}
+						"description": "Requires Super Admin JWT. Deactivates an organization and all its users."
 					},
 					"response": []
 				}
@@ -721,21 +243,28 @@
 			"description": "Onboarding external databases and managing user access.",
 			"item": [
 				{
-					"name": "List Data Sources",
+					"name": "Search for Data Sources",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/datasources/",
+							"raw": "{{baseUrl}}/api/datasources?search=Postgres",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"datasources",
-								""
+								"datasources"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Postgres",
+									"description": "Search by name or type"
+								}
 							]
-						}
+						},
+						"description": "NEW: Search for available data sources within the organization."
 					},
 					"response": []
 				},
@@ -757,6 +286,16 @@
 						}
 					],
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_org_admin}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
@@ -783,56 +322,7 @@
 					"response": []
 				},
 				{
-					"name": "Grant DB Access to User",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"data_source_id\": \"{{data_source_id}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{member_user_id}}",
-								"database-access"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User's DB Access List",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"users",
-								"{{member_user_id}}",
-								"database-access"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Enriched Schema",
+					"name": "Get Enriched Schema by ID",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -847,37 +337,8 @@
 								"{{data_source_id}}",
 								"schema"
 							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Schema Description",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"table_name\": \"users\",\n    \"column_name\": \"email\",\n    \"description\": \"The primary contact email for a user. Must be unique.\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/datasources/{{data_source_id}}/schema/description",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"datasources",
-								"{{data_source_id}}",
-								"schema",
-								"description"
-							]
-						}
+						"description": "Gets the real-time schema from the database, enhanced with any user-provided descriptions."
 					},
 					"response": []
 				}
@@ -909,32 +370,13 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Q4 Sales Analysis\"\n}",
+							"raw": "{\n    \"title\": \"AI Test Session\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{baseUrl}}/api/chat/sessions",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"chat",
-								"sessions"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get User Chat Sessions",
-					"request": {
-						"method": "GET",
-						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/api/chat/sessions",
 							"host": [
@@ -978,100 +420,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Get Chat History",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/chat/sessions/{{session_id}}/messages",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"chat",
-								"sessions",
-								"{{session_id}}",
-								"messages"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Audit",
-			"description": "Endpoints for reviewing audit trails.",
-			"item": [
-				{
-					"name": "Get Audit Logs",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/audit/logs?limit=10&action=LOGIN",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"audit",
-								"logs"
-							],
-							"query": [
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "action",
-									"value": "LOGIN"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Permission Change Logs",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/audit/permissions",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"audit",
-								"permissions"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get Audit Summary",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/audit/summary",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"audit",
-								"summary"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		}
@@ -1096,6 +444,10 @@
 			"value": ""
 		},
 		{
+			"key": "jwt_org_admin",
+			"value": ""
+		},
+		{
 			"key": "jwt_user",
 			"value": ""
 		},
@@ -1116,6 +468,10 @@
 			"value": ""
 		},
 		{
+			"key": "onboarded_org_id",
+			"value": ""
+		},
+		{
 			"key": "data_source_id",
 			"value": ""
 		},
@@ -1129,6 +485,14 @@
 		},
 		{
 			"key": "role_request_id",
+			"value": ""
+		},
+		{
+			"key": "ds_request_id",
+			"value": ""
+		},
+		{
+			"key": "permission_id_user_create",
 			"value": ""
 		}
 	]

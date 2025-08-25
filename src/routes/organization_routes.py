@@ -7,3 +7,8 @@ organization_bp.add_url_rule('/onboard',
                              'onboard', 
                              OrganizationController.onboard, 
                              methods=['POST'])
+
+organization_bp.add_url_rule('/<org_id>', 
+                             'delete_organization', 
+                             OrganizationController.delete_organization, 
+                             methods=['DELETE'])

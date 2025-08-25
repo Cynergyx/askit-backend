@@ -252,3 +252,24 @@ class UserController:
         )
         
         return jsonify({'message': 'User verified successfully'}), 200
+    
+
+    @staticmethod
+    @jwt_required_with_org
+    @require_permission('user.read')
+    def get_user_roles(user_id):
+        """Get all roles assigned to a specific user."""
+        user = User.query.filter_by(
+            id=user_id,
+            organization_id=g.current_organization.id
+        ).first()
+
+        if not user:
+            return jsonify({'message': 'User not found'}), 404
+
+        active_roles = user.get_roles() # This property already gets active roles
+        
+        return jsonify({
+            'user_id': user.id,
+            'roles': [role.to_dict() for role in active_roles]
+        }), 200

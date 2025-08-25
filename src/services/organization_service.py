@@ -94,3 +94,34 @@ class OrganizationService:
             import logging
             logging.exception("Onboarding failed")
             return None, f"An unexpected error occurred during onboarding: {str(e)}"
+    
+
+    @staticmethod
+    def deactivate_organization(organization_id: str):
+        """
+        Soft-deletes an organization by setting it and all its users to inactive.
+        Returns the organization object and the number of users deactivated, or an error.
+        """
+        org = Organization.query.get(organization_id)
+        if not org:
+            return None, "Organization not found."
+
+        if not org.is_active:
+            return None, "Organization is already inactive."
+
+        try:
+            # Using a transaction to ensure atomicity
+            with db.session.begin():
+                org.is_active = False
+                
+                # Deactivate all users within that organization
+                users_in_org = User.query.filter_by(organization_id=org.id).all()
+                for user in users_in_org:
+                    user.is_active = False
+                
+                db.session.commit()
+
+            return org, len(users_in_org)
+        except Exception as e:
+            db.session.rollback()
+            return None, f"An error occurred: {str(e)}"

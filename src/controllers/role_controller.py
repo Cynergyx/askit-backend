@@ -13,11 +13,18 @@ class RoleController:
     @jwt_required_with_org
     @require_permission('role.read')
     def get_roles():
-        """Get all roles in organization"""
-        roles = Role.query.filter_by(
+        """Get all roles in organization, with optional search by name."""
+        search_name = request.args.get('name')
+        
+        query = Role.query.filter_by(
             organization_id=g.current_organization.id,
             is_active=True
-        ).all()
+        )
+        
+        if search_name:
+            query = query.filter(Role.name.ilike(f'%{search_name}%'))
+
+        roles = query.all()
         
         return jsonify({
             'roles': [role.to_dict(include_permissions=True) for role in roles]

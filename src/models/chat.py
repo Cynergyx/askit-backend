@@ -31,7 +31,7 @@ class ChatMessage(db.Model):
     session_id = db.Column(db.String(36), db.ForeignKey('chat_sessions.id'), nullable=False)
     sender = db.Column(db.Enum('user', 'ai', name='chat_sender_type'), nullable=False)
     content = db.Column(db.JSON, nullable=False)
-    ai_metadata = db.Column(db.JSON, nullable=False)
+    ai_metadata = db.Column(db.JSON, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     
     session = db.relationship('ChatSession', back_populates='messages')

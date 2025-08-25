@@ -11,3 +11,4 @@ user_bp.add_url_rule('/<user_id>', 'delete_user', UserController.delete_user, me
 user_bp.add_url_rule('/<user_id>/verify', 'verify_user', UserController.verify_user, methods=['POST'])
 user_bp.add_url_rule('/<user_id>/roles', 'assign_role', UserController.assign_role, methods=['POST'])
 user_bp.add_url_rule('/<user_id>/roles', 'revoke_role', UserController.revoke_role, methods=['DELETE'])
+user_bp.add_url_rule('/<user_id>/roles', 'get_user_roles', UserController.get_user_roles, methods=['GET'])
