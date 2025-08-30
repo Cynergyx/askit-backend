@@ -58,5 +58,10 @@ class Role(db.Model):
 
 class RolePermission(db.Model):
     __tablename__ = 'role_permissions'
-    role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), primary_key=True)
-    permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), primary_key=True)
+    
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    role_id = db.Column(db.String(36), db.ForeignKey('roles.id'), nullable=False)
+    permission_id = db.Column(db.String(36), db.ForeignKey('permissions.id'), nullable=False)
+    is_active = db.Column(db.Boolean, default=True, nullable=False, index=True)
+    granted_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), nullable=False)
+    granted_by = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=True)
