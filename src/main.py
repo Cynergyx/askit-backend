@@ -4,6 +4,7 @@ from src.models import user, role, permission, organization, audit, data_source,
 
 def create_app(config_object_name='config.DevelopmentConfig'):
     app = Flask(__name__)
+    cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
     app.config.from_object(config_object_name)
 
     db.init_app(app)
