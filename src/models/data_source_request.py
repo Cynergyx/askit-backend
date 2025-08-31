@@ -23,3 +23,17 @@ class DataSourceRequest(db.Model):
     requested_data_source = db.relationship('DataSource', foreign_keys=[requested_data_source_id])
     reviewed_by = db.relationship('User', foreign_keys=[reviewed_by_id])
     organization = db.relationship('Organization')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'organization_id': self.organization_id,
+            'requested_data_source_id': self.requested_data_source_id,
+            'reason': self.reason,
+            'status': self.status,
+            'created_at': self.created_at.isoformat(),
+            'reviewed_at': self.reviewed_at.isoformat() if self.reviewed_at else None,
+            'reviewed_by_id': self.reviewed_by_id,
+            'reviewer_notes': self.reviewer_notes
+        }

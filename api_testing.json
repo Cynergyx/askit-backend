@@ -1,14 +1,14 @@
 {
 	"info": {
-		"_postman_id": "a1b2c3d4-e5f6-4a9b-8c7d-6e5f4a3b2c1d",
-		"name": "Askit API",
-		"description": "Exhaustive API collection for the Cynergyx-Askit backend application. Includes automated variable setting for a smooth workflow and all new endpoints.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "6422794a-7a41-4e7e-b537-46ab1aa5c90c",
+		"name": "Askit APIs",
+		"description": "Exhaustive API collection for the Cynergyx-Askit backend application. Includes automated variable setting for a smooth workflow.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26060661"
 	},
 	"item": [
 		{
 			"name": "Auth",
-			"description": "User authentication and registration.",
 			"item": [
 				{
 					"name": "Login Super Admin",
@@ -23,7 +23,8 @@
 									"    console.log(\"Set Super Admin JWT.\");",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -32,7 +33,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"super@admin.com\",\n    \"password\": \"password\",\n    \"organization\": \"superorg\"\n}",
+							"raw": "{\n    \"email\": \"admin@superorg.com\",\n    \"password\": \"admin@123\",\n    \"organization\": \"superorg\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -55,51 +56,7 @@
 					"response": []
 				},
 				{
-					"name": "Login Org Admin",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    var jsonData = pm.response.json();",
-									"    pm.collectionVariables.set(\"jwt_org_admin\", jsonData.access_token);",
-									"    console.log(\"Set Org Admin JWT.\");",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"admin@innovatecorp.com\",\n    \"password\": \"StrongPassword123!\",\n    \"organization\": \"innovatecorp.com\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/auth/login",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"auth",
-								"login"
-							]
-						},
-						"description": "Login as the organization admin to perform admin-level tasks. Sets `jwt_org_admin`."
-					},
-					"response": []
-				},
-				{
-					"name": "Login Org Member",
+					"name": "Login Org Admin/User",
 					"event": [
 						{
 							"listen": "test",
@@ -110,10 +67,11 @@
 									"    pm.collectionVariables.set(\"jwt_user\", jsonData.access_token);",
 									"    pm.collectionVariables.set(\"user_id\", jsonData.user.id);",
 									"    pm.collectionVariables.set(\"org_id\", jsonData.user.organization_id);",
-									"    console.log(\"Set Org Member JWT, User ID, and Org ID.\");",
+									"    console.log(\"Set User JWT, User ID, and Org ID from login.\");",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -122,7 +80,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"analyst@innovatecorp.com\",\n    \"password\": \"AnotherPassword456!\",\n    \"organization\": \"innovatecorp.com\"\n}",
+							"raw": "// {\n//     \"email\": \"alex.johnson@techsolutions.com\",\n//     \"password\": \"SecurePass1!\",\n//     \"organization\": \"techsolutions.com\"\n// }\n\n// {\n//     \"email\": \"arijit.ghosh@techsolutions.com\",\n//     \"password\": \"DefaultPassword123!\",\n//     \"organization\": \"techsolutions.com\"\n// }\n\n{\n    \"email\": \"ssr@techsolutions.com\",\n    \"password\": \"DefaultPassword123!\",\n    \"organization\": \"techsolutions.com\"\n}\n\n// {\n//     \"email\": \"utsav@techsolutions.com\",\n//     \"password\": \"DefaultPassword123!\",\n//     \"organization\": \"techsolutions.com\"\n// }\n\n// {\n//     \"email\": \"deya@techsolutions.com\",\n//     \"password\": \"DefaultPassword123!\",\n//     \"organization\": \"techsolutions.com\"\n// }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -140,15 +98,101 @@
 								"login"
 							]
 						},
-						"description": "Login as a regular organization member. This sets the `jwt_user` and other related variables."
+						"description": "Login as a regular organization user or admin. This sets the `jwt_user` and other related variables."
+					},
+					"response": []
+				},
+				{
+					"name": "Register New User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\n//     \"email\": \"deya@techsolutions.com\",\n//     \"password\": \"DefaultPassword123!\",\n//     \"first_name\": \"Deya\",\n//     \"last_name\": \"Hazra\",\n//     \"organization\": \"techsolutions.com\"\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_user}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						}
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "User authentication and registration."
 		},
 		{
 			"name": "Organization",
-			"description": "Onboarding and managing organizations.",
 			"item": [
 				{
 					"name": "Onboard New Organization",
@@ -160,12 +204,11 @@
 									"if (pm.response.code === 201) {",
 									"    var jsonData = pm.response.json();",
 									"    pm.collectionVariables.set(\"onboarded_org_id\", jsonData.organization.id);",
-									"    pm.collectionVariables.set(\"org_admin_id\", jsonData.users.find(u => u.email === 'admin@innovatecorp.com').id);",
-									"    pm.collectionVariables.set(\"member_user_id\", jsonData.users.find(u => u.email === 'analyst@innovatecorp.com').id);",
-									"    console.log(\"Set onboarded_org_id, org_admin_id, and member_user_id from response.\");",
+									"    console.log(\"Set onboarded_org_id from response.\");",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -184,7 +227,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"organization\": {\n        \"name\": \"Innovate Corp\",\n        \"domain\": \"innovatecorp.com\"\n    },\n    \"roles\": [\n        { \"name\": \"Data Analyst\", \"description\": \"Can view dashboards and run queries.\" },\n        { \"name\": \"Project Manager\", \"description\": \"Manages projects and users.\" }\n    ],\n    \"users\": [\n        {\n            \"email\": \"admin@innovatecorp.com\",\n            \"password\": \"StrongPassword123!\",\n            \"first_name\": \"Org\",\n            \"last_name\": \"Admin\",\n            \"is_admin\": true\n        },\n        {\n            \"email\": \"analyst@innovatecorp.com\",\n            \"password\": \"AnotherPassword456!\",\n            \"first_name\": \"Data\",\n            \"last_name\": \"Person\",\n            \"is_admin\": false,\n            \"roles\": [\"Data Analyst\"]\n        }\n    ]\n}",
+							"raw": "{\n    \"organization\": {\n        \"name\": \"Tech Solutions Inc.\",\n        \"domain\": \"techsolutions.com\"\n    },\n    \"roles\": [\n        { \"name\": \"Software Engineer\", \"description\": \"Develops, tests, and maintains software applications.\" },\n        { \"name\": \"Product Manager\", \"description\": \"Defines product vision, strategy, and roadmap.\" },\n        { \"name\": \"Human Resources Specialist\", \"description\": \"Manages employee relations, benefits, and hiring.\" },\n        { \"name\": \"Chief Executive Officer\", \"description\": \"Sets the company's strategic direction and vision.\" },\n        { \"name\": \"Accountant\", \"description\": \"Manages financial records, budgets, and payroll.\" },\n        { \"name\": \"Marketing Strategist\", \"description\": \"Plans and executes marketing campaigns.\" },\n        { \"name\": \"Customer Support Specialist\", \"description\": \"Assists customers with product inquiries and issues.\" },\n        { \"name\": \"Data Scientist\", \"description\": \"Analyzes complex data sets to solve business problems.\" },\n        { \"name\": \"UX/UI Designer\", \"description\": \"Designs user-friendly interfaces and experiences.\" },\n        { \"name\": \"IT Administrator\", \"description\": \"Manages and maintains the company's IT infrastructure and systems.\" }\n    ],\n    \"users\": [\n        {\n            \"email\": \"alex.johnson@techsolutions.com\",\n            \"password\": \"SecurePass1!\",\n            \"first_name\": \"Alex\",\n            \"last_name\": \"Johnson\",\n            \"is_admin\": true,\n            \"roles\": [\"Chief Executive Officer\"]\n        },\n        {\n            \"email\": \"maria.rodriguez@techsolutions.com\",\n            \"password\": \"SecurePass2!\",\n            \"first_name\": \"Maria\",\n            \"last_name\": \"Rodriguez\",\n            \"is_admin\": false,\n            \"roles\": [\"Software Engineer\"]\n        },\n        {\n            \"email\": \"chris.evans@techsolutions.com\",\n            \"password\": \"SecurePass3!\",\n            \"first_name\": \"Chris\",\n            \"last_name\": \"Evans\",\n            \"is_admin\": false,\n            \"roles\": [\"Product Manager\", \"Software Engineer\"]\n        },\n        {\n            \"email\": \"samantha.green@techsolutions.com\",\n            \"password\": \"SecurePass4!\",\n            \"first_name\": \"Samantha\",\n            \"last_name\": \"Green\",\n            \"is_admin\": false,\n            \"roles\": [\"Human Resources Specialist\"]\n        },\n        {\n            \"email\": \"daniel.kim@techsolutions.com\",\n            \"password\": \"SecurePass5!\",\n            \"first_name\": \"Daniel\",\n            \"last_name\": \"Kim\",\n            \"is_admin\": false,\n            \"roles\": [\"Accountant\"]\n        },\n        {\n            \"email\": \"jessica.lee@techsolutions.com\",\n            \"password\": \"SecurePass6!\",\n            \"first_name\": \"Jessica\",\n            \"last_name\": \"Lee\",\n            \"is_admin\": false,\n            \"roles\": [\"Marketing Strategist\"]\n        },\n        {\n            \"email\": \"michael.chen@techsolutions.com\",\n            \"password\": \"SecurePass7!\",\n            \"first_name\": \"Michael\",\n            \"last_name\": \"Chen\",\n            \"is_admin\": false,\n            \"roles\": [\"Customer Support Specialist\"]\n        },\n        {\n            \"email\": \"emily.white@techsolutions.com\",\n            \"password\": \"SecurePass8!\",\n            \"first_name\": \"Emily\",\n            \"last_name\": \"White\",\n            \"is_admin\": false,\n            \"roles\": [\"Customer Support Specialist\", \"Marketing Strategist\"]\n        },\n        {\n            \"email\": \"laura.foster@techsolutions.com\",\n            \"password\": \"SecurePass9!\",\n            \"first_name\": \"Laura\",\n            \"last_name\": \"Foster\",\n            \"is_admin\": false,\n            \"roles\": [\"Data Scientist\"]\n        },\n        {\n            \"email\": \"david.martinez@techsolutions.com\",\n            \"password\": \"SecurePass10!\",\n            \"first_name\": \"David\",\n            \"last_name\": \"Martinez\",\n            \"is_admin\": false,\n            \"roles\": [\"UX/UI Designer\"]\n        },\n        {\n            \"email\": \"susan.clark@techsolutions.com\",\n            \"password\": \"SecurePass11!\",\n            \"first_name\": \"Susan\",\n            \"last_name\": \"Clark\",\n            \"is_admin\": true,\n            \"roles\": [\"Product Manager\", \"Software Engineer\"]\n        },\n        {\n            \"email\": \"adam.baker@techsolutions.com\",\n            \"password\": \"SecurePass12!\",\n            \"first_name\": \"Adam\",\n            \"last_name\": \"Baker\",\n            \"is_admin\": false,\n            \"roles\": [\"Software Engineer\"]\n        },\n        {\n            \"email\": \"linda.davis@techsolutions.com\",\n            \"password\": \"SecurePass13!\",\n            \"first_name\": \"Linda\",\n            \"last_name\": \"Davis\",\n            \"is_admin\": false,\n            \"roles\": [\"Human Resources Specialist\"]\n        },\n        {\n            \"email\": \"kevin.wilson@techsolutions.com\",\n            \"password\": \"SecurePass14!\",\n            \"first_name\": \"Kevin\",\n            \"last_name\": \"Wilson\",\n            \"is_admin\": false,\n            \"roles\": [\"Accountant\", \"IT Administrator\"]\n        },\n        {\n            \"email\": \"sarah.miller@techsolutions.com\",\n            \"password\": \"SecurePass15!\",\n            \"first_name\": \"Sarah\",\n            \"last_name\": \"Miller\",\n            \"is_admin\": false,\n            \"roles\": [\"Marketing Strategist\", \"Product Manager\"]\n        },\n        {\n            \"email\": \"robert.brown@techsolutions.com\",\n            \"password\": \"SecurePass16!\",\n            \"first_name\": \"Robert\",\n            \"last_name\": \"Brown\",\n            \"is_admin\": false,\n            \"roles\": [\"Customer Support Specialist\"]\n        },\n        {\n            \"email\": \"olivia.jones@techsolutions.com\",\n            \"password\": \"SecurePass17!\",\n            \"first_name\": \"Olivia\",\n            \"last_name\": \"Jones\",\n            \"is_admin\": false,\n            \"roles\": [\"Data Scientist\"]\n        },\n        {\n            \"email\": \"james.taylor@techsolutions.com\",\n            \"password\": \"SecurePass18!\",\n            \"first_name\": \"James\",\n            \"last_name\": \"Taylor\",\n            \"is_admin\": false,\n            \"roles\": [\"UX/UI Designer\", \"Software Engineer\"]\n        },\n        {\n            \"email\": \"sophia.anderson@techsolutions.com\",\n            \"password\": \"SecurePass19!\",\n            \"first_name\": \"Sophia\",\n            \"last_name\": \"Anderson\",\n            \"is_admin\": false,\n            \"roles\": [\"IT Administrator\"]\n        },\n        {\n            \"email\": \"william.thomas@techsolutions.com\",\n            \"password\": \"SecurePass20!\",\n            \"first_name\": \"William\",\n            \"last_name\": \"Thomas\",\n            \"is_admin\": false,\n            \"roles\": [\"Software Engineer\"]\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -207,7 +250,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete Organization (Soft)",
+					"name": "Delete Organization",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -231,40 +274,643 @@
 								"organizations",
 								"{{onboarded_org_id}}"
 							]
-						},
-						"description": "Requires Super Admin JWT. Deactivates an organization and all its users."
+						}
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Onboarding and managing organizations."
 		},
 		{
-			"name": "Data Sources & Access",
-			"description": "Onboarding external databases and managing user access.",
+			"name": "Users",
 			"item": [
 				{
-					"name": "Search for Data Sources",
+					"name": "Get All Users",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/datasources?search=Postgres",
+							"raw": "{{baseUrl}}/api/users?page=3&per_page=10",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
-								"datasources"
+								"users"
 							],
 							"query": [
 								{
 									"key": "search",
-									"value": "Postgres",
-									"description": "Search by name or type"
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "3"
+								},
+								{
+									"key": "per_page",
+									"value": "10"
 								}
 							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"utsav@techsolutions.com\",\n    \"first_name\": \"Utsav\",\n    \"last_name\": \"Das\",\n    \"password\": \"DefaultPassword123!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						"description": "NEW: Search for available data sources within the organization."
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Data\",\n    \"last_name\": \"Analyst\",\n    \"is_active\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Soft)",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "CRUD operations for users."
+		},
+		{
+			"name": "Roles & Permissions",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    var pmRole = jsonData.roles.find(r => r.name === 'Project Manager');",
+									"    if (pmRole) {",
+									"        pm.collectionVariables.set(\"role_id_pm\", pmRole.id);",
+									"        console.log(\"Set role_id_pm from response.\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's Roles List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Role to User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Role from User",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"SDE 1\",\n    \"display_name\": \"SDE1\",\n    \"description\": \"Software Developer.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Manages projects, users, and their associated tasks.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Permissions to Role",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permission_id\": \"{{permission_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/roles/{{role_id_pm}}/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles",
+								"{{role_id_pm}}",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Managing roles and their associated permissions."
+		},
+		{
+			"name": "Role Requests",
+			"item": [
+				{
+					"name": "User Requests a Role",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"role_request_id\", jsonData.id);",
+									"    console.log(\"Set role_request_id from response.\");",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role_id\": \"{{role_id_pm}}\",\n    \"reason\": \"I need to develop.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Lists Pending Requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests?status=PENDING",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "PENDING"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Approves Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"Approved for Q4 project.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests/{{role_request_id}}/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests",
+								"{{role_request_id}}",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Denies Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notes\": \"This role is not required for your current duties.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/role-requests/{{role_request_id}}/deny",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"role-requests",
+								"{{role_request_id}}",
+								"deny"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Workflow for users to request additional roles."
+		},
+		{
+			"name": "Data Sources & Access",
+			"item": [
+				{
+					"name": "Get All Data Sources",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/datasources/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"datasources",
+								""
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "postgres",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User's DB Access List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"database-access"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Grant DB Access to User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data_source_id\": \"{{data_source_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{member_user_id}}/database-access",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{member_user_id}}",
+								"database-access"
+							]
+						}
 					},
 					"response": []
 				},
@@ -281,26 +927,17 @@
 									"    console.log(\"Set data_source_id from response.\");",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": [
-								{
-									"key": "token",
-									"value": "{{jwt_org_admin}}",
-									"type": "string"
-								}
-							]
-						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n        \"name\": \"Production Postgres DB\",\n        \"type\": \"postgresql\",\n        \"host\": \"localhost\",\n        \"port\": 5432,\n        \"database_name\": \"rbac_db\",\n        \"username\": \"user\",\n        \"password\": \"password\"\n    }\n]",
+							"raw": "[\n    {\n        \"name\": \"E-commerce Database Test\",\n        \"type\": \"postgresql\",\n        \"host\": \"localhost\",\n        \"port\": 5432,\n        \"database_name\": \"E-commerce Database\",\n        \"username\": \"postgres\",\n        \"password\": \"1212\"\n    }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -322,7 +959,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Enriched Schema by ID",
+					"name": "Get DB Schema by ID",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -337,16 +974,144 @@
 								"{{data_source_id}}",
 								"schema"
 							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Schema Description",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"table_name\": \"users\",\n    \"column_name\": \"email\",\n    \"description\": \"The primary contact email for a user. Must be unique.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
-						"description": "Gets the real-time schema from the database, enhanced with any user-provided descriptions."
+						"url": {
+							"raw": "{{baseUrl}}/api/datasources/{{data_source_id}}/schema/description",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"datasources",
+								"{{data_source_id}}",
+								"schema",
+								"description"
+							]
+						}
 					},
 					"response": []
 				}
-			]
+			],
+			"description": "Onboarding external databases and managing user access."
+		},
+		{
+			"name": "Data Source Requests",
+			"item": [
+				{
+					"name": "User Requests a DB access",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data_source_id\": \"{{data_source_id}}\",\n    \"reason\": \"Need access for Q4 reporting.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/data-source-requests/",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"data-source-requests",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Lists Pending Requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/data-source-requests/?status=PENDING",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"data-source-requests",
+								""
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "PENDING"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Approves Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/data-source-requests/{{ds_request_id}}/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"data-source-requests",
+								"{{ds_request_id}}",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Denies Request",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/data-source-requests/{{ds_request_id}}/deny",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"data-source-requests",
+								"{{ds_request_id}}",
+								"deny"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Request and approve access to data sources."
 		},
 		{
 			"name": "Chat & AI",
-			"description": "Interacting with the AI agent.",
 			"item": [
 				{
 					"name": "Create Chat Session",
@@ -370,13 +1135,32 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"AI Test Session\"\n}",
+							"raw": "{\n    \"title\": \"Q4 Sales Analysis\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/sessions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Chat Sessions",
+					"request": {
+						"method": "GET",
+						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/api/chat/sessions",
 							"host": [
@@ -420,8 +1204,103 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Chat History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/chat/sessions/{{session_id}}/messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"chat",
+								"sessions",
+								"{{session_id}}",
+								"messages"
+							]
+						}
+					},
+					"response": []
 				}
-			]
+			],
+			"description": "Interacting with the AI agent."
+		},
+		{
+			"name": "Audit",
+			"item": [
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/audit/logs?limit=10&action=LOGIN",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"logs"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "action",
+									"value": "LOGIN"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permission Change Logs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/audit/permissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/audit/summary",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"audit",
+								"summary"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for reviewing audit trails."
 		}
 	],
 	"auth": {
@@ -434,6 +1313,28 @@
 			}
 		]
 	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
 	"variable": [
 		{
 			"key": "baseUrl",
@@ -441,10 +1342,6 @@
 		},
 		{
 			"key": "jwt_super_admin",
-			"value": ""
-		},
-		{
-			"key": "jwt_org_admin",
 			"value": ""
 		},
 		{
@@ -468,10 +1365,6 @@
 			"value": ""
 		},
 		{
-			"key": "onboarded_org_id",
-			"value": ""
-		},
-		{
 			"key": "data_source_id",
 			"value": ""
 		},
@@ -492,8 +1385,13 @@
 			"value": ""
 		},
 		{
-			"key": "permission_id_user_create",
+			"key": "permission_id",
 			"value": ""
+		},
+		{
+			"key": "onboarded_org_id",
+			"value": "",
+			"type": "string"
 		}
 	]
 }
