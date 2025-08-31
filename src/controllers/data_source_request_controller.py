@@ -10,7 +10,6 @@ from datetime import datetime
 class DataSourceRequestController:
     @staticmethod
     @jwt_required_with_org
-    # A user needs permission to read datasources to request one
     @require_permission('datasource.read') 
     def request_access():
         data = request.get_json()

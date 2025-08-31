@@ -13,14 +13,12 @@ import uuid
 def seed():
     """Seeds or updates the database with system roles and permissions."""
     
-    # Check if the command has already run. We will still proceed to ensure roles are up-to-date.
     if Role.query.filter_by(name='Super Admin').first():
         click.echo('System roles found. Verifying and updating permissions...')
     else:
         click.echo('Seeding database with initial data...')
 
     # --- Permissions Data ---
-    # This list defines all possible permissions in the system.
     permissions_data = [
         # User Management
         {'name': 'user.create', 'resource': 'user', 'action': 'create'},
@@ -59,7 +57,6 @@ def seed():
         {'name': 'chat.read', 'resource': 'chat', 'action': 'read'},
     ]
     
-    # Create any permissions that don't already exist
     existing_perms = {p.name for p in Permission.query.all()}
     new_perms_data = [p for p in permissions_data if p['name'] not in existing_perms]
     if new_perms_data:
@@ -72,10 +69,7 @@ def seed():
     perm_map = {p.name: p for p in all_perms}
 
     # --- System Role Templates ---
-    # This section creates or updates the role templates that are cloned for new organizations.
     click.echo('Creating/updating system role templates...')
-
-    # Use merge to either create or update existing system roles
     super_admin_role = Role.query.filter_by(name='Super Admin').first() or Role(id=str(uuid.uuid4()), name='Super Admin', is_system_role=True)
     super_admin_role.display_name = 'Super Administrator'
     
@@ -85,7 +79,6 @@ def seed():
     member_role_template = Role.query.filter_by(name='Member', is_system_role=True).first() or Role(id=str(uuid.uuid4()), name='Member', is_system_role=True)
     member_role_template.display_name = 'Member'
     
-    # NEW: Define Viewer and Editor role templates
     viewer_role_template = Role.query.filter_by(name='Viewer', is_system_role=True).first() or Role(id=str(uuid.uuid4()), name='Viewer', is_system_role=True)
     viewer_role_template.display_name = 'Viewer'
     viewer_role_template.description = 'Read-only access to most resources.'
@@ -94,7 +87,6 @@ def seed():
     editor_role_template.display_name = 'Editor'
     editor_role_template.description = 'Can create and edit certain resources.'
     
-    # Use merge to handle both creation and updates seamlessly
     db.session.merge(super_admin_role)
     db.session.merge(org_admin_role_template)
     db.session.merge(member_role_template)
@@ -103,36 +95,28 @@ def seed():
     db.session.commit()
 
     # --- Assign Permissions to Roles ---
-    # Clear existing permissions to ensure a clean slate on every run
     super_admin_role.permissions.clear()
     org_admin_role_template.permissions.clear()
     member_role_template.permissions.clear()
     viewer_role_template.permissions.clear()
     editor_role_template.permissions.clear()
 
-    # Define permission sets for each role
     super_admin_role.permissions.extend(all_perms)
     
     admin_perms_names = [p['name'] for p in permissions_data if p['name'] not in ['organization.create', 'organization.delete']]
     
-    # UPDATED: Member role gets permission to see available data sources
     member_perms_names = [
         'user.read', 'role.read', 'rolerequest.create', 'chat.create', 
         'chat.read', 'database.read', 'datasource.read'
     ]
     
-    # NEW: Viewer permissions (read-only)
     viewer_perms_names = [
         'user.read', 'role.read', 'audit.read', 'datasource.read', 
         'chat.read', 'database.read'
     ]
     
-    # NEW: Editor permissions (Viewer + create/edit capabilities)
-    editor_perms_names = viewer_perms_names + [
-        'chat.create', 'datasource.update'
-    ]
+    editor_perms_names = viewer_perms_names + ['chat.create', 'datasource.update']
     
-    # Assign permissions from the defined lists
     for perm_name in admin_perms_names:
         if perm_map.get(perm_name): org_admin_role_template.permissions.append(perm_map[perm_name])
     
@@ -149,7 +133,6 @@ def seed():
     click.echo('System role templates and permissions have been configured.')
 
     # --- Super Admin User and Organization ---
-    # This logic only runs once on the very first seed
     super_org_domain = os.getenv('SUPER_ADMIN_ORG_DOMAIN', 'superorg')
     super_org = Organization.query.filter_by(domain=super_org_domain).first()
     if not super_org:
@@ -183,11 +166,10 @@ def seed():
         db.session.add(super_admin_user)
         db.session.commit()
         
-        # Manually create the UserRole assignment
         user_role_assignment = UserRole(
             user_id=super_admin_user.id,
             role_id=super_admin_role.id,
-            granted_by_user_id=super_admin_user.id # Self-granted
+            granted_by_user_id=super_admin_user.id
         )
         db.session.add(user_role_assignment)
         db.session.commit()
