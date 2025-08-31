@@ -144,6 +144,10 @@ def seed():
     if super_admin_role:
         super_admin_role.organization_id = super_org.id
         db.session.commit()
+        # Ensure super admin always has all permissions
+        super_admin_role.permissions.clear()
+        super_admin_role.permissions.extend(all_perms)
+        db.session.commit()
     
     admin_email = os.getenv('SUPER_ADMIN_EMAIL')
     admin_password = os.getenv('SUPER_ADMIN_PASSWORD')
