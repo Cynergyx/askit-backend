@@ -19,6 +19,7 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     from src.routes.audit_routes import audit_bp
     from src.routes.database_access_routes import db_access_bp
     from src.routes.data_source_routes import datasource_bp
+    from src.routes.data_source_request_routes import ds_request_bp
     from src.routes.organization_routes import organization_bp
     from src.routes.role_request_routes import role_request_bp
     from src.routes.chat_routes import chat_bp
@@ -27,11 +28,12 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     app.register_blueprint(user_bp, url_prefix='/api/users')
     app.register_blueprint(role_bp, url_prefix='/api/roles')
     app.register_blueprint(audit_bp, url_prefix='/api/audit')
-    app.register_blueprint(db_access_bp, url_prefix='/api/users') # Prefixed with users
+    app.register_blueprint(db_access_bp, url_prefix='/api/users')
     app.register_blueprint(datasource_bp, url_prefix='/api/datasources')
+    app.register_blueprint(ds_request_bp, url_prefix='/api/data-source-requests')
     app.register_blueprint(organization_bp, url_prefix='/api/organizations')
-    app.register_blueprint(role_request_bp, url_prefix='/api/role-requests') # Register role request
-    app.register_blueprint(chat_bp, url_prefix='/api/chat') # Register chat
+    app.register_blueprint(role_request_bp, url_prefix='/api/role-requests')
+    app.register_blueprint(chat_bp, url_prefix='/api/chat')
 
     from src.commands import seed
     app.cli.add_command(seed)
