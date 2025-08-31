@@ -10,7 +10,7 @@ def create_app(config_object_name='config.DevelopmentConfig'):
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
-    cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
+    
     if app.config.get('REDIS_URL'):
         redis_client.init_app(app)
 
