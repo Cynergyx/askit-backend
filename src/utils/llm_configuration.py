@@ -69,12 +69,20 @@ class LLMConfig:
 
 
     def _prepare_gemini_history(self):
-        """Converts standard history to Gemini's format ('assistant' -> 'model')."""
+        """Converts standard history to Gemini's format ('assistant' -> 'model').
+        Ensures 'parts' is a list of dicts with 'text' or 'inline_data' keys, as required by Gemini API.
+        """
         gemini_history = []
         for msg in self.initial_history:
             role = 'model' if msg.role == 'assistant' else msg.role
-            gemini_history.append({'role': role, 'parts': [msg.content]})
+            content = msg.content
 
+            if isinstance(content, dict):
+                part = {"text": json.dumps(content, ensure_ascii=False)}
+            else:
+                part = {"text": str(content)}
+
+            gemini_history.append({'role': role, 'parts': [part]})
         return gemini_history
     
 
