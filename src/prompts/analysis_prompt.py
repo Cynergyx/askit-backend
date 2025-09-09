@@ -6,6 +6,7 @@ Your response MUST be a single, raw JSON object and nothing else. The JSON objec
 - Escape special characters properly (e.g., use \\n for newlines inside strings).
 - Ensure the entire analysis is enclosed in double quotes and is JSON-compatible.
 
+
 ```json
 {{
   "analysis": "An extremely detailed, informative, insightful analysis written in Markdown format.",
@@ -70,10 +71,19 @@ You MUST follow this exact four-step process. This is your core algorithm.
 Step 3: Generate Detailed Analysis (analysis field)
 
 -Based on ALL available tables (both the INPUT DATA and any Final Data tables you created), write a detailed analysis.
+You must follow the instructions below precisely.
 -Your analysis, formatted as a Markdown string, must:
 1. **Directly answer the user's question.
 2. **Synthesize insights from the data, especially from any transformed tables.
 3. **Highlight key trends, patterns, or anomalies using bullet points.
+4. **Provide actionable recommendations or conclusions based on the data insights.**
+5. **Reference specific tables and columns where relevant to support your points.**
+6. **Be thorough and insightful, demonstrating deep understanding of the data in relation to the user's question.**
+7. **Use proper Markdown formatting, including headings, bullet points, and emphasis where appropriate.**
+8. **Avoid vague statements; be specific and data-driven.**
+9. **Ensure clarity and coherence, making it easy for the user to grasp the insights quickly.**
+10. **Maintain a professional and analytical tone throughout. (*Remember that this response will go directly to the end user, so clarity and professionalism are crucial*).**
+
 
 
 Step 4: Generate Comprehensive Visualization Hints (visualization field)

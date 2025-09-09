@@ -7,6 +7,7 @@ from src.services.audit_service import AuditService
 from src.services.schema_service import SchemaService
 from src.controllers.ai_controller import AICompute
 import asyncio
+import uuid
 
 class ChatController:
 
@@ -95,8 +96,23 @@ class ChatController:
             db.session.rollback()
             print(f"AI processing failed: {e}")
             return jsonify({'message': str(e)}), 500
+        
+        import uuid
 
-        ai_message = ChatMessage(session_id=session.id, sender='ai', content=ai_response_content, ai_metadata=ai_metadata)
+        def make_json_serializable(obj):
+            if isinstance(obj, dict):
+                return {k: make_json_serializable(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [make_json_serializable(i) for i in obj]
+            elif isinstance(obj, uuid.UUID):
+                return str(obj)
+            else:
+                return obj
+
+        # Ensure all UUIDs are converted to strings before saving
+        serializable_content = make_json_serializable(ai_response_content)
+        serializable_metadata = make_json_serializable(ai_metadata)
+        ai_message = ChatMessage(session_id=session.id, sender='ai', content=serializable_content, ai_metadata=serializable_metadata)
         db.session.add(ai_message)
         db.session.commit()
 
