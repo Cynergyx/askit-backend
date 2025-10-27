@@ -124,4 +124,4 @@ class ChatController:
             resource_id=session.id
         )
         response_message = ai_message.to_dict()
-        return jsonify(response_message['content']), 200
+        return jsonify(response_message), 200
