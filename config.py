@@ -1,5 +1,6 @@
 import os
 from datetime import timedelta
+from typing import Optional
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
@@ -27,10 +28,10 @@ class Config:
 
     # --- CONSOLIDATED AI/LLM SETTINGS ---
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
-    GROQ_API_KEY: str | None = os.getenv("GROQ_API_KEY")
-    OPENAI_API_KEY: str | None = os.getenv("OPENAI_API_KEY")
-    ANTHROPIC_API_KEY: str | None = os.getenv("ANTHROPIC_API_KEY")
-    GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY")
+    GROQ_API_KEY: Optional[str] = os.getenv("GROQ_API_KEY")
+    OPENAI_API_KEY: Optional[str] = os.getenv("OPENAI_API_KEY")
+    ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
+    GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY")
     DEFAULT_MODEL_PROVIDER: str = os.getenv("DEFAULT_MODEL_PROVIDER", "gemini")
     
     # Security
