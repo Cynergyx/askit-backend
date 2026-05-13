@@ -1,30 +1,29 @@
-### 🛡️ AskIT – Advanced RBAC & Identity Backend
+### 🧠 AskIT – AI-Powered Natural Language Database Backend
 
-**AskIT** is a robust, multi-tenant backend API service for managing users, roles, and permissions. Built with **Python** and the **Flask** framework, it provides a comprehensive Role-Based Access Control (RBAC) system, complete with authentication, SSO integration, and detailed audit logging. It's designed to be the secure identity core for your applications.
+**AskIT** is an innovative backend API service that empowers users to query their databases and generate insights using natural language. It acts as an intelligent bridge between your users and your data, utilizing advanced LLMs to translate everyday questions into optimized SQL queries, execute them securely, and return actionable, easy-to-understand insights.
 
 ---
 
 #### ⚙️ What This Repo Is
 
-This is the backend core for an advanced Identity and Access Management (IAM) platform. It handles:
+This is the backend core for a conversational data analytics platform. It handles:
 
-*   👤 **User & Organization Management**: Multi-tenant support for isolating users and data by organization.
-*   🔐 **Authentication**: Secure email/password login, JWT (Access & Refresh tokens), and SSO (OAuth2, LDAP, SAML placeholders).
-*   ⚖️ **Role-Based Access Control (RBAC)**: Fine-grained control with roles, permissions, and role hierarchy.
-*   📜 **Audit Trail**: Detailed logging of all significant actions for security and compliance.
-*   🗃️ **Database Integration**: Built on SQLAlchemy with PostgreSQL support and includes database migrations with Flask-Migrate.
-*   ⚡ **Flask Performance**: A production-ready, scalable Python backend.
+* 🤖 **Natural Language to SQL (NL2SQL)**: Leverages LLMs to accurately convert user questions into complex database queries.
+* 📊 **Automated Insight Generation**: Processes raw database results into meaningful summaries, data points, and natural language responses.
+* 🔌 **Database Connection Management**: Securely connects to and manages schemas for various SQL databases (e.g., PostgreSQL, MySQL, SQLite).
+* 🛡️ **Query Security & Sanitization**: Implements strict read-only execution environments and query validation to protect your data integrity.
+* 🔗 **API-First Design**: Provides a clean RESTful interface, making it easy to plug this AI capability into any frontend dashboard, chat UI, or existing application.
 
 ---
 
 #### 🚀 Features
 
-*   🏢 **Multi-Tenancy**: Isolate data and users by organization via subdomains or headers.
-*   🔑 **Flexible Authentication**: Supports standard login, and integrates with OAuth2 (Google, Microsoft), LDAP, and SAML.
-*   👑 **Hierarchical Roles**: Define parent-child relationships between roles for permission inheritance.
-*   👁️ **Granular Permissions**: Assign specific permissions (e.g., `user.create`, `role.read`) to roles.
-*   📝 **Comprehensive Auditing**: Track every critical action, from user logins to permission changes.
-*   ⚙️ **Extensible Services**: Clean separation of concerns with controllers, services, and models.
+* 💬 **Conversational Analytics**: Allow end-users to "chat" with their data without writing a single line of SQL.
+* 🧠 **LLM Integration**: Built-in orchestration for leading language models (like OpenAI, Anthropic, etc.) optimized for schema understanding.
+* 🔒 **Safe Execution Guardrails**: Built-in query sanitization ensures that generated queries are safe, performant, and restricted from destructive actions (no DROP or DELETE).
+* 📈 **Dynamic Context Injection**: Automatically feeds the LLM relevant database schema context (tables, columns, relationships) to improve query accuracy.
+* ⚡ **High Performance**: Optimized for fast schema parsing, minimal latency during LLM handshakes, and quick response times.
+* ⚙️ **Extensible Architecture**: Clean separation of API routes, LLM prompt engineering, and database execution logic.
 
 ---
 
